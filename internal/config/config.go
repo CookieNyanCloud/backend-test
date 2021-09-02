@@ -59,28 +59,37 @@ func Init(configDir string) (*Config, error)  {
 		viper.SetDefault(k,v)
 	}
 
-	if err := parseEnv(); err != nil {
+	if err := parseConfigFile(configDir, viper.GetString("env")); err != nil {
+		return nil, err
+	}
+	var cfg Config
+	if err := unmarshal(&cfg); err != nil {
 		return nil, err
 	}
 
-
-}
-
-func parseEnv() error {
-	if err := parsePostgresEnvVariables(); err != nil {
-		return err
+	if err := parseEnvVariables(); err != nil {
+		return nil, err
 	}
-	return parseHostFromEnv()
+	return &cfg, nil
 }
 
-func parsePostgresEnvVariables() error {
+
+
+func parseEnvVariables() error {
 	viper.SetEnvPrefix("postgres")
 	return viper.BindEnv("pass")
 }
-func parseHostFromEnv() error {
-	viper.SetEnvPrefix("http")
-	return viper.BindEnv("host")
+
+func parseConfigFile(folder, env string) error {
+	viper.AddConfigPath(folder)
+	viper.SetConfigName("main")
+	if err := viper.ReadInConfig(); err != nil {
+		return err
+	}
+	viper.SetConfigName(env)
+	return viper.MergeInConfig()
 }
+
 
 
 
