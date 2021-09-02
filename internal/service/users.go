@@ -17,15 +17,15 @@ func NewUsersService(
 	}
 }
 
-func Transaction(ctx context.Context, input UserTransactionInput) error {
+func (s *UsersService) Transaction(ctx context.Context, input UserTransactionInput) error {
 	return  nil
 }
 
-func Remittance(ctx context.Context, input UserRemittanceInput) error {
+func (s *UsersService) Remittance(ctx context.Context, input UserRemittanceInput) error {
 	return  nil
 }
 
-func Balance(ctx context.Context, input UserBalanceInput) (string, error) {
+func (s *UsersService) Balance(ctx context.Context, input UserBalanceInput) (string, error) {
 	return  "",nil
 }
 

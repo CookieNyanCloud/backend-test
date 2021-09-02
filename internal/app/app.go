@@ -1,15 +1,15 @@
 package app
 
-import(
+import (
 	"context"
 	"errors"
 	"github.com/cookienyancloud/avito-backend-test/internal/config"
+	delivery "github.com/cookienyancloud/avito-backend-test/internal/delivery/http"
 	"github.com/cookienyancloud/avito-backend-test/internal/repository"
 	"github.com/cookienyancloud/avito-backend-test/internal/server"
 	"github.com/cookienyancloud/avito-backend-test/internal/service"
 	"github.com/cookienyancloud/avito-backend-test/pkg/database/postgres"
 	log "github.com/sirupsen/logrus"
-	delivery "github.com/cookienyancloud/avito-backend-test/internal/delivery/http"
 	"net/http"
 	"os"
 	"os/signal"
@@ -17,7 +17,7 @@ import(
 	"time"
 )
 
-func Run(configPath string)  {
+func Run(configPath string) {
 	//log.SetFormatter(&log.JSONFormatter{})
 
 	cfg, err := config.Init(configPath)
@@ -64,6 +64,5 @@ func Run(configPath string)  {
 	if err := postgresClient.Close(); err != nil {
 		log.Errorf("error occurred on db connection close: %s", err.Error())
 	}
-
 
 }
