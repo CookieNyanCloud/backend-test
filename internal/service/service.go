@@ -6,39 +6,55 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserTransactionInput struct {
+type FinanceService struct {
+	repo repository.Finance
+}
+
+func NewFinanceService(
+	repo repository.Finance,
+) *FinanceService {
+	return &FinanceService{
+		repo,
+	}
+}
+
+type TransactionInput struct {
 	id  uuid.UUID
 	sum string
 }
 
-type UserRemittanceInput struct {
+type RemittanceInput struct {
 	idFrom uuid.UUID
 	idTo   uuid.UUID
 	sum    string
 }
 
-type UserBalanceInput struct {
+type BalanceInput struct {
 	id  uuid.UUID
 	sum string
 }
 
-type Users interface {
-	Transaction(ctx context.Context, input UserTransactionInput) error
-	Remittance(ctx context.Context, input UserRemittanceInput) error
-	Balance(ctx context.Context, input UserBalanceInput) (string, error)
+type Finance interface {
+	Transaction(ctx context.Context, input TransactionInput) error
+	Remittance(ctx context.Context, input RemittanceInput) error
+	Balance(ctx context.Context, input BalanceInput) (string, error)
 }
 
-type Services struct {
-	Users
+func (s *FinanceService) Transaction(ctx context.Context, input TransactionInput) error {
+	return  nil
+}
+
+func (s *FinanceService) Remittance(ctx context.Context, input RemittanceInput) error {
+	return  nil
+}
+
+func (s *FinanceService) Balance(ctx context.Context, input BalanceInput) (string, error) {
+	return  "",nil
 }
 
 
-func NewServices(repos *repository.Repositories) *Services {
-	usersService:=NewUsersService(repos)
-	return &Services{
-		usersService,
-	}
-}
+
+
 
 
 

@@ -58,36 +58,40 @@ func Init(configDir string) (*Config, error)  {
 	for k, v := range defaults{
 		viper.SetDefault(k,v)
 	}
-
-	if err := parseConfigFile(configDir, viper.GetString("env")); err != nil {
+	// чтение .env файла
+	viper.SetEnvPrefix("postgres")
+	if err :=viper.BindEnv("pass"); err != nil {
 		return nil, err
 	}
+
+	//чтение данных из файла конфигураций
+	viper.AddConfigPath(configDir)
+	viper.SetConfigName("main")
+	if err := viper.ReadInConfig(); err != nil {
+		return nil, err
+	}
+
 	var cfg Config
-	//if err := unmarshal(&cfg); err != nil {
-	//	return nil, err
-	//}
-
-	if err := parseEnvVariables(); err != nil {
+	//заполняем структуру значениями из файла конфигураций
+	if err := unmarshal(&cfg); err != nil {
 		return nil, err
 	}
+	//заполняем структуру значениями из .env
+	cfg.Postgres.Password = viper.GetString("pass")
 	return &cfg, nil
 }
 
-
-
-func parseEnvVariables() error {
-	viper.SetEnvPrefix("postgres")
-	return viper.BindEnv("pass")
-}
-
-func parseConfigFile(folder, env string) error {
-	viper.AddConfigPath(folder)
-	viper.SetConfigName("main")
-	if err := viper.ReadInConfig(); err != nil {
+func unmarshal(cfg *Config) error {
+	if err := viper.UnmarshalKey("postgres", &cfg.Postgres); err != nil {
 		return err
 	}
-	viper.SetConfigName(env)
-	return viper.MergeInConfig()
+	if err := viper.UnmarshalKey("http", &cfg.HTTP); err != nil {
+		return err
+	}
+	if err := viper.UnmarshalKey("limiter", &cfg.Limiter); err != nil {
+		return err
+	}
+	return nil
 }
 
 

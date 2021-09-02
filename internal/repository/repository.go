@@ -7,21 +7,35 @@ import (
 )
 
 const (
-	usersTable = "users"
+	financeTable = "finance"
 )
 
-type Users interface {
+type FinanceRepo struct {
+	db *sqlx.DB
+}
+
+func NewFinanceRepo(db *sqlx.DB) *FinanceRepo {
+	return &FinanceRepo{db: db}
+}
+
+type Finance interface {
 	Transaction(ctx context.Context, id uuid.UUID, sum float64) error
 	Remittance(ctx context.Context, idFrom uuid.UUID, idTo uuid.UUID, sum float64) error
 	Balance(ctx context.Context, id uuid.UUID, cur string) (string, error)
 }
 
-type Repositories struct {
-	Users
+func (r *FinanceRepo) NewFinanceRepo(db *sqlx.DB) *FinanceRepo {
+	return &FinanceRepo{db: db}
 }
 
-func NewRepositories(db *sqlx.DB) *Repositories {
-	return &Repositories{
-		NewUsersRepo(db),
-	}
+func (r *FinanceRepo) Transaction(ctx context.Context, id uuid.UUID, sum float64) error {
+	return nil
+}
+
+func (r *FinanceRepo) Remittance(ctx context.Context, idFrom uuid.UUID, idTo uuid.UUID, sum float64) error {
+	return nil
+}
+
+func (r *FinanceRepo) Balance(ctx context.Context, id uuid.UUID, cur string) (string, error) {
+	return "", nil
 }

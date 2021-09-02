@@ -9,7 +9,8 @@ import (
 	"github.com/cookienyancloud/avito-backend-test/internal/server"
 	"github.com/cookienyancloud/avito-backend-test/internal/service"
 	"github.com/cookienyancloud/avito-backend-test/pkg/database/postgres"
-	log "github.com/sirupsen/logrus"
+	"github.com/cookienyancloud/avito-backend-test/pkg/logger"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -18,25 +19,29 @@ import (
 )
 
 func Run(configPath string) {
-	//log.SetFormatter(&log.JSONFormatter{})
 
+	//подтягиваем значения переменных из папки конфигураций и .env
 	cfg, err := config.Init(configPath)
 	if err != nil {
-		log.Error(err)
+		logger.Errorf("ошибка инициализации переменных:%v",err)
 		return
 	}
 
+	//инициализация базы данных
 	postgresClient, err := postgres.NewClient(cfg.Postgres)
 	if err != nil {
-		log.Error(err)
+		logger.Errorf("ошибка инициализации базы данных:%v",err)
 		return
 	}
+	repos := repository.NewFinanceRepo(postgresClient)
 
-	repos := repository.NewRepositories(postgresClient)
+	//инициализация сервиса
+	service := service.NewFinanceService(repos)
 
-	service := service.NewUsersService(repos)
+	//http
 	handlers := delivery.NewHandler(service)
 
+	//сервер
 	srv := server.NewServer(cfg, handlers.Init(cfg))
 
 	go func() {
@@ -58,11 +63,11 @@ func Run(configPath string) {
 	defer shutdown()
 
 	if err := srv.Stop(ctx); err != nil {
-		log.Errorf("failed to stop server: %v", err)
+		logger.Errorf("ошибка при остановке сервера: %v",err)
 	}
 
 	if err := postgresClient.Close(); err != nil {
-		log.Errorf("error occurred on db connection close: %s", err.Error())
+		logger.Errorf("ошибка при остановке сервера: %v",err.Error())
 	}
 
 }
