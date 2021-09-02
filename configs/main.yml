@@ -5,18 +5,22 @@ postgres:
   dbname:   "postgres"
   SSLMode:  "disable"
 
-#http:
-#  port: 8090
-#  maxHeaderBytes: 1
-#  readTimeout: 10s
-#  writeTimeout: 10s
-#
+http:
+  port: 8090
+  maxHeaderBytes: 1
+  readTimeout: 10s
+  writeTimeout: 10s
 
-#cache:
-#  ttl: 3600s
+
 
 
 #limiter:
 #  rps: 10
 #  burst: 4
 #  ttl: 1000m
+
+
+#cache:
+#  ttl: 3600s
+
+

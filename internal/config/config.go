@@ -63,9 +63,9 @@ func Init(configDir string) (*Config, error)  {
 		return nil, err
 	}
 	var cfg Config
-	if err := unmarshal(&cfg); err != nil {
-		return nil, err
-	}
+	//if err := unmarshal(&cfg); err != nil {
+	//	return nil, err
+	//}
 
 	if err := parseEnvVariables(); err != nil {
 		return nil, err
