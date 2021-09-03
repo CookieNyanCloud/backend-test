@@ -25,12 +25,6 @@ func Run(configPath string) {
 		logger.Errorf("ошибка инициализации переменных:%v",err)
 		return
 	}
-	println(cfg.Postgres.SSLMode)
-	println(cfg.Postgres.Password)
-	println(cfg.Postgres.Username)
-	println(cfg.Postgres.DBName)
-	println(cfg.Postgres.Host)
-	println(cfg.Postgres.Port)
 
 	//инициализация базы данных
 	postgresClient, err := postgres.NewClient(cfg.Postgres)

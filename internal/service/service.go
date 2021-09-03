@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 	"github.com/cookienyancloud/avito-backend-test/internal/repository"
-	"github.com/google/uuid"
 )
+//todo:uuid
 
 type FinanceService struct {
 	repo repository.Finance
@@ -18,52 +18,22 @@ func NewFinanceService(
 	}
 }
 
-type TransactionInput struct {
-	id  uuid.UUID
-	sum string
-}
-
-type RemittanceInput struct {
-	idFrom uuid.UUID
-	idTo   uuid.UUID
-	sum    string
-}
-
-type BalanceInput struct {
-	id  uuid.UUID
-	sum string
-}
-
 type Finance interface {
-	Transaction(ctx context.Context, input TransactionInput) error
-	Remittance(ctx context.Context, input RemittanceInput) error
-	Balance(ctx context.Context, input BalanceInput) (string, error)
-}
-
-func (s *FinanceService) Transaction(ctx context.Context, input TransactionInput) error {
-	return  nil
-}
-
-func (s *FinanceService) Remittance(ctx context.Context, input RemittanceInput) error {
-	return  nil
-}
-
-func (s *FinanceService) Balance(ctx context.Context, input BalanceInput) (string, error) {
-	return  "",nil
+	Transaction(ctx context.Context, id int, sum float64 ) (error, string)
+	Remittance(ctx context.Context, idFrom int, idTo int, sum string ) (error, string)
+	BalanceBalance(ctx context.Context, id int, cur string) (string , error)
 }
 
 
 
+func (s *FinanceService) Transaction(ctx context.Context, id int, sum float64 ) (error, string) {
+	return s.repo.Transaction(ctx, id, sum)
+}
 
+func (s *FinanceService) Remittance(ctx context.Context, idFrom int, idTo int, sum int64 ) (error, string) {
+	return nil, ""
+}
 
-
-
-
-
-
-
-
-
-
-
-
+func (s *FinanceService) Balance(ctx context.Context, id int, cur string ) (int64 , error) {
+	return 0, nil
+}

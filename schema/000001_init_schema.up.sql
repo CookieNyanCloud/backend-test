@@ -1,16 +1,24 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
-CREATE TABLE IF NOT EXISTS user_balance
+-- CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- todo: uuid
+-- todo: no init users
+CREATE TABLE IF NOT EXISTS userbalance
 (
-    id      UUID NOT NULL PRIMARY KEY,
-    balance decimal
+--     id      UUID NOT NULL PRIMARY KEY,
+    id      INT NOT NULL PRIMARY KEY,
+    balance DECIMAL
 );
 
 CREATE TABLE IF NOT EXISTS transactions
 (
-    user_id   UUID        NOT NULL REFERENCES user_balance (id) ON DELETE CASCADE,
+--     user_id   UUID        NOT NULL REFERENCES userbalance (id) ON DELETE CASCADE,
+    user_id   INT         NOT NULL REFERENCES userbalance (id) ON DELETE CASCADE,
     operation varchar(16) NOT NULL,
-    user_to   UUID
+    user_to   DECIMAL
 );
+
+INSERT INTO userbalance (id, balance)
+values (1, null),
+       (2, 100),
+       (3, 200);
 
 
