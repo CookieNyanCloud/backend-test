@@ -5,16 +5,17 @@ import (
 	"time"
 )
 
-//значкения по умолчанию
+//todo: mapstructure
 
+//значкения по умолчанию
 var (
 	defaults = map[string]interface{}{
-		"defaultHttpPort"               : "8000",
-		"defaultHttpRWTimeout"          : 10 * time.Second,
-		"defaultHttpMaxHeaderMegabytes" : 1,
-		"defaultLimiterRPS"             : 10,
-		"defaultLimiterBurst"           : 2,
-		"defaultLimiterTTL"             : 10 * time.Minute,
+		"defaultHttpPort":               "8000",
+		"defaultHttpRWTimeout":          10 * time.Second,
+		"defaultHttpMaxHeaderMegabytes": 1,
+		"defaultLimiterRPS":             10,
+		"defaultLimiterBurst":           2,
+		"defaultLimiterTTL":             10 * time.Minute,
 	}
 )
 
@@ -22,8 +23,8 @@ var (
 type (
 	Config struct {
 		Postgres PostgresConfig
-		HTTP        HTTPConfig
-		Limiter     LimiterConfig
+		HTTP     HTTPConfig
+		Limiter  LimiterConfig
 	}
 
 	PostgresConfig struct {
@@ -48,20 +49,13 @@ type (
 		Burst int
 		TTL   time.Duration
 	}
-
-
 )
 
-func Init(configDir string) (*Config, error)  {
+func Init(configDir string) (*Config, error) {
 
 	//заполнение значений по умолчанию
-	for k, v := range defaults{
-		viper.SetDefault(k,v)
-	}
-	// чтение .env файла
-	viper.SetEnvPrefix("postgres")
-	if err :=viper.BindEnv("pass"); err != nil {
-		return nil, err
+	for k, v := range defaults {
+		viper.SetDefault(k, v)
 	}
 
 	//чтение данных из файла конфигураций
@@ -76,8 +70,16 @@ func Init(configDir string) (*Config, error)  {
 	if err := unmarshal(&cfg); err != nil {
 		return nil, err
 	}
+
+	// чтение .env файла
+	viper.AddConfigPath(".")
+	viper.SetConfigFile(".env")
+	if err := viper.ReadInConfig(); err != nil {
+		return nil, err
+	}
+
 	//заполняем структуру значениями из .env
-	cfg.Postgres.Password = viper.GetString("pass")
+	cfg.Postgres.Password = viper.GetString("postgres_pass")
 	return &cfg, nil
 }
 
@@ -93,31 +95,3 @@ func unmarshal(cfg *Config) error {
 	}
 	return nil
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

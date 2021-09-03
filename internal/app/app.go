@@ -10,7 +10,6 @@ import (
 	"github.com/cookienyancloud/avito-backend-test/internal/service"
 	"github.com/cookienyancloud/avito-backend-test/pkg/database/postgres"
 	"github.com/cookienyancloud/avito-backend-test/pkg/logger"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -26,6 +25,12 @@ func Run(configPath string) {
 		logger.Errorf("ошибка инициализации переменных:%v",err)
 		return
 	}
+	println(cfg.Postgres.SSLMode)
+	println(cfg.Postgres.Password)
+	println(cfg.Postgres.Username)
+	println(cfg.Postgres.DBName)
+	println(cfg.Postgres.Host)
+	println(cfg.Postgres.Port)
 
 	//инициализация базы данных
 	postgresClient, err := postgres.NewClient(cfg.Postgres)
@@ -36,38 +41,32 @@ func Run(configPath string) {
 	repos := repository.NewFinanceRepo(postgresClient)
 
 	//инициализация сервиса
-	service := service.NewFinanceService(repos)
+	financeService := service.NewFinanceService(repos)
 
 	//http
-	handlers := delivery.NewHandler(service)
+	handlers := delivery.NewHandler(financeService)
 
 	//сервер
 	srv := server.NewServer(cfg, handlers.Init(cfg))
-
 	go func() {
 		if err := srv.Run(); !errors.Is(err, http.ErrServerClosed) {
-			log.Errorf("error occurred while running http server: %s\n", err.Error())
+			logger.Errorf("возникла ошибка в работе http сервера: %s\n", err.Error())
 		}
 	}()
+	logger.Info("запуск")
 
-	log.Info("Server started")
-
+	//выход
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
-
 	<-quit
-
 	const timeout = 5 * time.Second
-
 	ctx, shutdown := context.WithTimeout(context.Background(), timeout)
 	defer shutdown()
-
 	if err := srv.Stop(ctx); err != nil {
 		logger.Errorf("ошибка при остановке сервера: %v",err)
 	}
-
 	if err := postgresClient.Close(); err != nil {
-		logger.Errorf("ошибка при остановке сервера: %v",err.Error())
+		logger.Errorf("ошибка при закрытии соединения с бд: %v",err.Error())
 	}
 
 }
