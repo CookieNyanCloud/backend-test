@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -23,10 +22,10 @@ type CurrencyResponse struct {
 }
 
 type Currency interface {
-	GetCur(ctx context.Context, cur string, sum float64) (string, error)
+	GetCur(cur string, sum float64) (string, error)
 }
 
-func (u CurService) GetCur(ctx context.Context, cur string, sum float64) (string, error) {
+func (u CurService) GetCur(cur string, sum float64) (string, error) {
 
 	querry := fmt.Sprintf(baseCurURL, u.ApiKey, cur)
 	res, err := http.Get(querry)
@@ -47,7 +46,6 @@ func (u CurService) GetCur(ctx context.Context, cur string, sum float64) (string
 	if err != nil {
 		return "", err
 	}
-	//fmt.Printf("%T\n", userEurRub)
 
 	var userEurCur float64
 	switch i := jsondata.Rates[cur].(type) {

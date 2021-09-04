@@ -1,15 +1,13 @@
 package repository
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 )
 
-//todo:uuid
-//todo: no init users
-//todo:money types
+
+
 
 type FinanceRepo struct {
 	db *sqlx.DB
@@ -20,11 +18,12 @@ func NewFinanceRepo(db *sqlx.DB) *FinanceRepo {
 }
 
 type Finance interface {
-	Transaction(ctx context.Context, id int, sum float64) error
-	Remittance(ctx context.Context, idFrom int, idTo int, sum float64) error
-	Balance(ctc context.Context, id int) (float64,error)
+	Transaction(id int, sum float64) error
+	Remittance(idFrom int, idTo int, sum float64) error
+	Balance(id int) (float64,error)
 
-	NewTransaction(ctx context.Context, idFrom int, operation string, sum float64, idTo int) error
+	NewTransaction(idFrom int, operation string, sum float64, idTo int) error
+	//GetTransactionsList(id int,)
 }
 
 func (r *FinanceRepo) NewFinanceRepo(db *sqlx.DB) *FinanceRepo {
@@ -43,18 +42,12 @@ const (
 const (
 	transaction = "transaction"
 	remittance = "remittance"
-	balance = "balance"
 )
 
-const (
-	rub = "rub"
-	usd = "usd"
-	eur = "eur"
-)
 
-func (r *FinanceRepo) NewTransaction(ctx context.Context, idFrom int, operation string,sum float64, idTo int) error {
+func (r *FinanceRepo) NewTransaction(idFrom int, operation string,sum float64, idTo int) error {
 	if idTo >0 {
-		query := fmt.Sprintf("INSERT INTO %s (user_id, operation,sum, user_to) values ($1, $2, $3, $4) RETURNING id",
+		query := fmt.Sprintf("INSERT INTO %s (user_id, operation,sum, user_to) values ($1, $2, $3, $4)",
 			transactionTable)
 		_, err := r.db.Exec(query,idFrom,operation,sum, idTo)
 		if err != nil {
@@ -71,7 +64,7 @@ func (r *FinanceRepo) NewTransaction(ctx context.Context, idFrom int, operation 
 	return nil
 }
 
-func (r *FinanceRepo) Balance (ctx context.Context, id int) (float64, error)  {
+func (r *FinanceRepo) Balance (id int) (float64, error)  {
 	var currentBalance float64
 	query := fmt.Sprintf(`SELECT balance FROM %s WHERE id=$1`, financeTable)
 	err := r.db.Get(&currentBalance, query, id)
@@ -81,9 +74,9 @@ func (r *FinanceRepo) Balance (ctx context.Context, id int) (float64, error)  {
 	return currentBalance, nil
 }
 
-func (r *FinanceRepo) Transaction(ctx context.Context, id int, sum float64) error {
+func (r *FinanceRepo) Transaction(id int, sum float64) error {
 
-	currentBalance, err:= r.Balance(ctx,id)
+	currentBalance, err:= r.Balance(id)
 	if err != nil {
 		return err
 	}
@@ -95,7 +88,7 @@ func (r *FinanceRepo) Transaction(ctx context.Context, id int, sum float64) erro
 		if err != nil {
 			return err
 		}
-		err = r.NewTransaction(ctx, id, transaction, sum,-1)
+		err = r.NewTransaction(id, transaction, sum,-1)
 		if err != nil {
 			return err
 		}
@@ -104,13 +97,13 @@ func (r *FinanceRepo) Transaction(ctx context.Context, id int, sum float64) erro
 	return errors.New(Minus)
 }
 
-func (r *FinanceRepo) Remittance(ctx context.Context, idFrom int, idTo int, sum float64) error {
-	currentBalanceFrom, err := r.Balance(ctx,idFrom)
+func (r *FinanceRepo) Remittance(idFrom int, idTo int, sum float64) error {
+	currentBalanceFrom, err := r.Balance(idFrom)
 	if err != nil {
 		return err
 	}
 
-	currentBalanceTo, err:= r.Balance(ctx, idTo)
+	currentBalanceTo, err:= r.Balance(idTo)
 	if err != nil {
 		return err
 	}
@@ -131,6 +124,12 @@ func (r *FinanceRepo) Remittance(ctx context.Context, idFrom int, idTo int, sum 
 		if err != nil {
 			return err
 		}
+
+		err = r.NewTransaction(idFrom, transaction, sum, idTo)
+		if err != nil {
+			return err
+		}
+
 		return nil
 	}
 	return errors.New(Minus)

@@ -17,6 +17,16 @@ import (
 	"time"
 )
 
+//todo: no init users?
+//todo:checks for data(tags)
+//todo:docker
+//todo:tests
+//todo:transactions sort+pagination
+//todo:readme
+
+//todo:uuid?
+//todo:money types?
+
 func Run(configPath string) {
 
 	//подтягиваем значения переменных из папки конфигураций и .env

@@ -5,8 +5,6 @@ import (
 	"time"
 )
 
-//todo: mapstructure
-
 //значкения по умолчанию
 var (
 	defaults = map[string]interface{}{

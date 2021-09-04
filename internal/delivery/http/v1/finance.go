@@ -7,7 +7,8 @@ import (
 	"net/http"
 )
 
-//todo:uuid
+
+
 func (h *Handler) initFinanceRoutes(api *gin.RouterGroup) {
 	operation := api.Group("/operation")
 	{
@@ -50,7 +51,7 @@ func (h *Handler) transaction(c *gin.Context) {
 
 	//передача данных
 
-	if err := h.services.Transaction(c, inp.Id, inp.Sum);err!= nil {
+	if err := h.services.Transaction(inp.Id, inp.Sum);err!= nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -67,7 +68,7 @@ func (h *Handler) remittance(c *gin.Context) {
 	}
 
 	//передача данных
-	if err := h.services.Remittance(c,inp.IdFrom,inp.IdTo,inp.Sum);err!= nil {
+	if err := h.services.Remittance(inp.IdFrom,inp.IdTo,inp.Sum);err!= nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -82,7 +83,7 @@ func (h *Handler) balance(c *gin.Context) {
 		newResponse(c, http.StatusBadRequest, "неверные данные")
 		return
 	}
-	balance ,err:= h.services.Balance(c,inp.Id)
+	balance ,err:= h.services.Balance(inp.Id)
 	if err!=nil{
 		newResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -95,7 +96,7 @@ func (h *Handler) balance(c *gin.Context) {
 		return
 	}
 
-	balanceInCur, err:= h.curService.GetCur(c,cur,balance)
+	balanceInCur, err:= h.curService.GetCur(cur,balance)
 	if err!=nil{
 		newResponse(c, http.StatusInternalServerError, err.Error())
 		return

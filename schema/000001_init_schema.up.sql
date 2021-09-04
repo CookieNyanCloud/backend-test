@@ -1,6 +1,5 @@
 -- CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
--- todo: uuid
--- todo: no init users
+
 CREATE TABLE IF NOT EXISTS userbalance
 (
 --     id      UUID NOT NULL PRIMARY KEY,
