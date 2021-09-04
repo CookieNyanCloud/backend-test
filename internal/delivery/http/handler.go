@@ -10,11 +10,13 @@ import (
 
 type Handler struct {
 	service     *service.FinanceService
+	curService  service.CurService
 }
 
-func NewHandler(service *service.FinanceService) *Handler {
+func NewHandler(service *service.FinanceService, curService service.CurService) *Handler {
 	return &Handler{
 		service: service,
+		curService:curService,
 	}
 }
 
@@ -38,7 +40,7 @@ func (h *Handler) Init(cfg *config.Config) *gin.Engine {
 }
 
 func (h *Handler) initAPI(router *gin.Engine) {
-	handlerV1 := v1.NewHandler(h.service)
+	handlerV1 := v1.NewHandler(h.service,h.curService)
 	api := router.Group("/api")
 	{
 		handlerV1.Init(api)

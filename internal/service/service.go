@@ -10,30 +10,24 @@ type FinanceService struct {
 	repo repository.Finance
 }
 
-func NewFinanceService(
-	repo repository.Finance,
-) *FinanceService {
-	return &FinanceService{
-		repo,
-	}
+func NewFinanceService(repo repository.Finance) *FinanceService {
+	return &FinanceService{repo}
 }
 
 type Finance interface {
-	Transaction(ctx context.Context, id int, sum float64 ) (error, string)
-	Remittance(ctx context.Context, idFrom int, idTo int, sum string ) (error, string)
-	BalanceBalance(ctx context.Context, id int, cur string) (string , error)
+	Transaction(ctx context.Context, id int, sum float64 ) error
+	Remittance(ctx context.Context, idFrom int, idTo int, sum string ) error
+	Balance(ctx context.Context, id int ) (float64 , error)
 }
 
-
-
-func (s *FinanceService) Transaction(ctx context.Context, id int, sum float64 ) (error, string) {
+func (s *FinanceService) Transaction(ctx context.Context, id int, sum float64 ) error {
 	return s.repo.Transaction(ctx, id, sum)
 }
 
-func (s *FinanceService) Remittance(ctx context.Context, idFrom int, idTo int, sum int64 ) (error, string) {
-	return nil, ""
+func (s *FinanceService) Remittance(ctx context.Context, idFrom int, idTo int, sum float64 ) error {
+	return s.repo.Remittance(ctx,idFrom,idTo,sum)
 }
 
-func (s *FinanceService) Balance(ctx context.Context, id int, cur string ) (int64 , error) {
-	return 0, nil
+func (s *FinanceService) Balance(ctx context.Context, id int) (float64 , error) {
+	return s.repo.Balance(ctx,id)
 }

@@ -25,6 +25,7 @@ func Run(configPath string) {
 		logger.Errorf("ошибка инициализации переменных:%v",err)
 		return
 	}
+	println(cfg.ApiKey)
 
 	//инициализация базы данных
 	postgresClient, err := postgres.NewClient(cfg.Postgres)
@@ -36,9 +37,10 @@ func Run(configPath string) {
 
 	//инициализация сервиса
 	financeService := service.NewFinanceService(repos)
+	curService:=service.CurService{cfg.ApiKey}
 
 	//http
-	handlers := delivery.NewHandler(financeService)
+	handlers := delivery.NewHandler(financeService,curService)
 
 	//сервер
 	srv := server.NewServer(cfg, handlers.Init(cfg))

@@ -25,6 +25,7 @@ type (
 		Postgres PostgresConfig
 		HTTP     HTTPConfig
 		Limiter  LimiterConfig
+		ApiKey string
 	}
 
 	PostgresConfig struct {
@@ -49,6 +50,7 @@ type (
 		Burst int
 		TTL   time.Duration
 	}
+
 )
 
 func Init(configDir string) (*Config, error) {
@@ -80,6 +82,7 @@ func Init(configDir string) (*Config, error) {
 
 	//заполняем структуру значениями из .env
 	cfg.Postgres.Password = viper.GetString("postgres_pass")
+	cfg.ApiKey = viper.GetString("api_key")
 	return &cfg, nil
 }
 

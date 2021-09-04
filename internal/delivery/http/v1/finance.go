@@ -17,6 +17,11 @@ func (h *Handler) initFinanceRoutes(api *gin.RouterGroup) {
 	}
 }
 
+const (
+	Success = "удачная транзакция"
+)
+
+
 type TransactionInput struct {
 	Id  int `json:"id" binding:"required"`
 	Sum float64    `json:"sum" binding:"required"`
@@ -25,12 +30,11 @@ type TransactionInput struct {
 type RemittanceInput struct {
 	IdFrom int `json:"id_from" binding:"required"`
 	IdTo   int `json:"id_to" binding:"required"`
-	Sum    string    `json:"sum" binding:"required"`
+	Sum    float64    `json:"sum" binding:"required"`
 }
 
 type BalanceInput struct {
 	Id  int `json:"id" binding:"required"`
-	Cur string    `json:"cur" binding:"required"`
 }
 
 
@@ -42,20 +46,54 @@ func (h *Handler) transaction(c *gin.Context) {
 		newResponse(c, http.StatusBadRequest, "неверные данные")
 		return
 	}
+
 	//передача данных
-	var message string
-	if err, message := h.services.Transaction(c, inp.Id, inp.Sum); err!= nil{
-		newResponse(c, http.StatusInternalServerError, message)
+
+	if err := h.services.Transaction(c, inp.Id, inp.Sum);err!= nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, response{message})
+	c.JSON(http.StatusOK, response{Success})
 
 }
 
 func (h *Handler) remittance(c *gin.Context) {
+	var inp RemittanceInput
+	//проверка данных для структуры
+	if err := c.BindJSON(&inp); err != nil {
+		newResponse(c, http.StatusBadRequest, "неверные данные")
+		return
+	}
+
+	//передача данных
+	if err := h.services.Remittance(c,inp.IdFrom,inp.IdTo,inp.Sum);err!= nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, response{Success})
 
 }
 
 func (h *Handler) balance(c *gin.Context) {
+	cur:=c.DefaultQuery("currency", "RUB")
+	var inp BalanceInput
+	if err := c.BindJSON(&inp); err != nil {
+		newResponse(c, http.StatusBadRequest, "неверные данные")
+		return
+	}
+	balance ,err:= h.services.Balance(c,inp.Id)
+	if err!=nil{
+		newResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	balanceInCur, err:= h.curService.GetCur(c,cur,balance)
+	if err!=nil{
+		newResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
 
+	c.JSON(http.StatusOK, BalanceResponse{
+		Balance:balanceInCur,
+		Cur:     cur,
+	})
 }

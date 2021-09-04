@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS userbalance
 (
 --     id      UUID NOT NULL PRIMARY KEY,
     id      INT NOT NULL PRIMARY KEY,
-    balance DECIMAL
+    balance DECIMAL CHECK (balance > 0)
 );
 
 CREATE TABLE IF NOT EXISTS transactions
@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS transactions
 --     user_id   UUID        NOT NULL REFERENCES userbalance (id) ON DELETE CASCADE,
     user_id   INT         NOT NULL REFERENCES userbalance (id) ON DELETE CASCADE,
     operation varchar(16) NOT NULL,
-    user_to   DECIMAL
+    sum DECIMAL,
+    user_to   INT
 );
 
 INSERT INTO userbalance (id, balance)
