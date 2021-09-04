@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	//"github.com/google/uuid"
 	"net/http"
@@ -86,6 +87,14 @@ func (h *Handler) balance(c *gin.Context) {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+	if cur == "RUB" {
+		c.JSON(http.StatusOK, BalanceResponse{
+			Balance: fmt.Sprintf("%.2f", balance),
+			Cur:     cur,
+		})
+		return
+	}
+
 	balanceInCur, err:= h.curService.GetCur(c,cur,balance)
 	if err!=nil{
 		newResponse(c, http.StatusInternalServerError, err.Error())
