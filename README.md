@@ -134,7 +134,7 @@ API_KEY=
 ```
 
 ## схема
-![Schema](https://ibb.co/R7mzhYB)
+![Schema](https://i.ibb.co/YbMpDPy/avito-schema.png)
 
 
 
