@@ -59,7 +59,7 @@ func (u CurService) GetCur(cur string, sum float64) (string, error) {
 		userEurRub = i
 	}
 	balanceInCur := sum * userEurCur / userEurRub
-	fmt.Printf("%f\n", balanceInCur)
+	//fmt.Printf("%f\n", balanceInCur)
 
-	return "", nil
+	return fmt.Sprintf("%f", balanceInCur), nil
 }

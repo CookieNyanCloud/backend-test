@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS userbalance
 (
 --     id      UUID NOT NULL PRIMARY KEY,
     id      INT NOT NULL PRIMARY KEY,
-    balance DECIMAL CHECK (balance > 0)
+    balance DECIMAL CHECK (balance >= 0)
 );
 
 CREATE TABLE IF NOT EXISTS transactions

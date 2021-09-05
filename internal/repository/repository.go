@@ -24,6 +24,7 @@ type Finance interface {
 
 	NewTransaction(idFrom int, operation string, sum float64, idTo int) error
 	//GetTransactionsList(id int,)
+	NewUser(id int, sum float64) error
 }
 
 func (r *FinanceRepo) NewFinanceRepo(db *sqlx.DB) *FinanceRepo {
@@ -37,12 +38,26 @@ const (
 
 const (
 	Minus   = "недостаточно средств"
+	noUser = "sql: no rows in result set"
+	noUserTxt = "пользователя нет"
+	noSense = "создание пользователя с заранее отрицательным балансом"
 )
 
 const (
 	transaction = "transaction"
 	remittance = "remittance"
 )
+
+func (r *FinanceRepo) NewUser(id int, sum float64) error{
+	query := fmt.Sprintf("INSERT INTO %s (id, balance) values ($1, $2)",
+		financeTable)
+	_, err := r.db.Exec(query,id, sum)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 
 func (r *FinanceRepo) NewTransaction(idFrom int, operation string,sum float64, idTo int) error {
@@ -69,8 +84,11 @@ func (r *FinanceRepo) Balance (id int) (float64, error)  {
 	query := fmt.Sprintf(`SELECT balance FROM %s WHERE id=$1`, financeTable)
 	err := r.db.Get(&currentBalance, query, id)
 	if err != nil {
-		return -1, err
-	}
+		if err.Error()==noUser{
+				return -1, errors.New(noUserTxt)
+			}
+			return -1, err
+		}
 	return currentBalance, nil
 }
 
@@ -78,6 +96,16 @@ func (r *FinanceRepo) Transaction(id int, sum float64) error {
 
 	currentBalance, err:= r.Balance(id)
 	if err != nil {
+		if err.Error()==noUser && sum > 0{
+			err=r.NewUser(id,sum)
+			if err != nil {
+				return err
+			}
+			err = r.NewTransaction(id, transaction, sum,-1)
+			if err != nil {
+				return err
+			}
+		}
 		return err
 	}
 
@@ -97,19 +125,32 @@ func (r *FinanceRepo) Transaction(id int, sum float64) error {
 	return errors.New(Minus)
 }
 
+const i  =  iota
+
 func (r *FinanceRepo) Remittance(idFrom int, idTo int, sum float64) error {
 	currentBalanceFrom, err := r.Balance(idFrom)
 	if err != nil {
+		if err.Error()==noUser {
+			return errors.New(noSense)
+		}
 		return err
 	}
 
 	currentBalanceTo, err:= r.Balance(idTo)
-	if err != nil {
+	if err != nil && err.Error()!= noUser {
 		return err
+	}
+	if err!=nil && err.Error()==noUser{
+		err = r.NewUser(idTo, 0)
+		currentBalanceTo=0
+		if err != nil {
+			return err
+		}
 	}
 
 	newBalanceFrom:= currentBalanceFrom - sum
 	newBalanceTo:= currentBalanceTo + sum
+
 	if newBalanceFrom >= 0 {
 		query := fmt.Sprintf("UPDATE %s SET balance = $1  WHERE id = $2",
 			financeTable)
