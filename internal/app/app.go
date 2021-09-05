@@ -23,8 +23,8 @@ import (
 //todo:precision
 //todo:comments
 
-//todo:uuid?
 //todo:money types?
+//todo:uuid?
 
 //readme
 //transactions sort+pagination
