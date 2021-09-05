@@ -21,6 +21,16 @@ type CurrencyResponse struct {
 	Rates     map[string]interface{} `json:"rates"`
 }
 
+var (
+	curSym = map[string]string{
+		"RUB": "₽",
+		"USD": "$",
+		"EUR": "€",
+		"GBP": "£",
+		"JPY": "¥",
+	}
+)
+
 type Currency interface {
 	GetCur(cur string, sum float64) (string, error)
 }
@@ -61,5 +71,5 @@ func (u CurService) GetCur(cur string, sum float64) (string, error) {
 	balanceInCur := sum * userEurCur / userEurRub
 	//fmt.Printf("%f\n", balanceInCur)
 
-	return fmt.Sprintf("%f", balanceInCur), nil
+	return fmt.Sprintf("%s%.2f",curSym[cur], balanceInCur), nil
 }
