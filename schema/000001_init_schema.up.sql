@@ -17,9 +17,3 @@ CREATE TABLE IF NOT EXISTS transactions
     user_to     INT
 );
 
--- INSERT INTO userbalance (id, balance)
--- values (1, null),
---        (2, 100),
---        (3, 200);
-
-

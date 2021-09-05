@@ -20,6 +20,7 @@ import (
 //todo:docker
 //todo:tests
 //todo:checks for data(tags)
+//todo:precision
 //todo:comments
 
 //todo:uuid?
