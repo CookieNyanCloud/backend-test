@@ -17,16 +17,16 @@ import (
 	"time"
 )
 
-//todo:transactions sort+pagination
+//todo:readme
 //todo:docker
 //todo:tests
 //todo:checks for data(tags)
-//todo:readme
 //todo:comments
 
 //todo:uuid?
 //todo:money types?
 
+//transactions sort+pagination
 //no init users?
 
 func Run(configPath string) {
