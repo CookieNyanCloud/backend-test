@@ -26,12 +26,12 @@ type TransactionsList struct {
 
 
 type Finance interface {
-	Transaction(id int, sum float64) error
-	Remittance(idFrom int, idTo int, sum float64) error
+	Transaction(id int, sum float64, description string) error
+	Remittance(idFrom int, idTo int, sum float64, description string) error
 	Balance(id int) (float64, error)
 
 	NewUser(id int, sum float64) error
-	NewTransaction(idFrom int, operation string, sum float64, idTo int) error
+	NewTransaction(idFrom int, operation string, sum float64, idTo int, description string) error
 	GetTransactionsList(id int, sort string,dir string, page int) ([]TransactionsList, error)
 }
 
@@ -56,7 +56,7 @@ const (
 	remittance  = "remittance"
 )
 
-func (r *FinanceRepo) Transaction(id int, sum float64) error {
+func (r *FinanceRepo) Transaction(id int, sum float64,description string) error {
 
 	currentBalance, err := r.Balance(id)
 	if err != nil {
@@ -65,7 +65,7 @@ func (r *FinanceRepo) Transaction(id int, sum float64) error {
 			if err != nil {
 				return err
 			}
-			err = r.NewTransaction(id, transaction, sum, -1)
+			err = r.NewTransaction(id, transaction, sum, -1,description)
 			if err != nil {
 				return err
 			}
@@ -80,7 +80,7 @@ func (r *FinanceRepo) Transaction(id int, sum float64) error {
 		if err != nil {
 			return err
 		}
-		err = r.NewTransaction(id, transaction, sum, -1)
+		err = r.NewTransaction(id, transaction, sum, -1, description)
 		if err != nil {
 			return err
 		}
@@ -89,7 +89,7 @@ func (r *FinanceRepo) Transaction(id int, sum float64) error {
 	return errors.New(Minus)
 }
 
-func (r *FinanceRepo) Remittance(idFrom int, idTo int, sum float64) error {
+func (r *FinanceRepo) Remittance(idFrom int, idTo int, sum float64,description string) error {
 	currentBalanceFrom, err := r.Balance(idFrom)
 	if err != nil {
 		if err.Error() == noUser {
@@ -99,10 +99,11 @@ func (r *FinanceRepo) Remittance(idFrom int, idTo int, sum float64) error {
 	}
 
 	currentBalanceTo, err := r.Balance(idTo)
-	if err != nil && err.Error() != noUser {
+	if err != nil && err.Error() != noUserTxt {
+		println("DS")
 		return err
 	}
-	if err != nil && err.Error() == noUser {
+	if err != nil && err.Error() == noUserTxt {
 		err = r.NewUser(idTo, 0)
 		currentBalanceTo = 0
 		if err != nil {
@@ -128,7 +129,7 @@ func (r *FinanceRepo) Remittance(idFrom int, idTo int, sum float64) error {
 			return err
 		}
 
-		err = r.NewTransaction(idFrom, remittance, sum, idTo)
+		err = r.NewTransaction(idFrom, remittance, sum, idTo,description)
 		if err != nil {
 			return err
 		}
@@ -162,18 +163,18 @@ func (r *FinanceRepo) NewUser(id int, sum float64) error {
 	return nil
 }
 
-func (r *FinanceRepo) NewTransaction(idFrom int, operation string, sum float64, idTo int) error {
+func (r *FinanceRepo) NewTransaction(idFrom int, operation string, sum float64, idTo int,description string) error {
 	if idTo > 0 {
-		query := fmt.Sprintf("INSERT INTO %s (user_id, operation,sum, user_to) values ($1, $2, $3, $4)",
+		query := fmt.Sprintf("INSERT INTO %s (user_id, operation,sum, user_to, description) values ($1, $2, $3, $4, $5)",
 			transactionTable)
-		_, err := r.db.Exec(query, idFrom, operation, sum, idTo)
+		_, err := r.db.Exec(query, idFrom, operation, sum, idTo, description)
 		if err != nil {
 			return err
 		}
 	} else {
-		query := fmt.Sprintf("INSERT INTO %s (user_id, operation, sum, user_to) values ($1, $2, $3, -1)",
+		query := fmt.Sprintf("INSERT INTO %s (user_id, operation, sum, user_to, description) values ($1, $2, $3, -1,$4)",
 			transactionTable)
-		_, err := r.db.Exec(query, idFrom, operation, sum)
+		_, err := r.db.Exec(query, idFrom, operation, sum, description)
 		if err != nil {
 			return err
 		}

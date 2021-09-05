@@ -29,12 +29,14 @@ const (
 type transactionInput struct {
 	Id  int `json:"id" binding:"required"`
 	Sum float64    `json:"sum" binding:"required"`
+	Description string `json:"description"`
 }
 
 type remittanceInput struct {
 	IdFrom int `json:"id_from" binding:"required"`
 	IdTo   int `json:"id_to" binding:"required"`
 	Sum    float64    `json:"sum" binding:"required"`
+	Description string `json:"description"`
 }
 
 type balanceInput struct {
@@ -45,14 +47,6 @@ type transactionsListInput struct {
 	Id  int `json:"id" binding:"required"`
 }
 
-//type transactionsList struct {
-//	Id          int       `json:"id"`
-//	Operation   string    `json:"operation"`
-//	Sum         float64   `json:"sum"`
-//	Date        time.Time `json:"date"`
-//	Description string    `json:"description"`
-//	IdTo        int       `json:"id_to"`
-//}
 
 
 func (h *Handler) transaction(c *gin.Context) {
@@ -66,7 +60,7 @@ func (h *Handler) transaction(c *gin.Context) {
 
 	//передача данных
 
-	if err := h.services.Transaction(inp.Id, inp.Sum);err!= nil {
+	if err := h.services.Transaction(inp.Id, inp.Sum, inp.Description);err!= nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -83,7 +77,7 @@ func (h *Handler) remittance(c *gin.Context) {
 	}
 
 	//передача данных
-	if err := h.services.Remittance(inp.IdFrom,inp.IdTo,inp.Sum);err!= nil {
+	if err := h.services.Remittance(inp.IdFrom,inp.IdTo,inp.Sum,inp.Description);err!= nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}

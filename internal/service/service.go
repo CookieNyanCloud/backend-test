@@ -22,18 +22,18 @@ func NewFinanceService(repo repository.Finance) *FinanceService {
 //}
 
 type Finance interface {
-	Transaction(id int, sum float64 ) error
-	Remittance(idFrom int, idTo int, sum string ) error
+	Transaction(id int, sum float64 ,description string) error
+	Remittance(idFrom int, idTo int, sum string, description string ) error
 	Balance(id int ) (float64 , error)
 	GetTransactionsList(id int, sort string,dir string, page int) ([]repository.TransactionsList, error)
 }
 
-func (s *FinanceService) Transaction(id int, sum float64 ) error {
-	return s.repo.Transaction(id, sum)
+func (s *FinanceService) Transaction(id int, sum float64,description string ) error {
+	return s.repo.Transaction(id, sum,description)
 }
 
-func (s *FinanceService) Remittance(idFrom int, idTo int, sum float64 ) error {
-	return s.repo.Remittance(idFrom,idTo,sum)
+func (s *FinanceService) Remittance(idFrom int, idTo int, sum float64,description string ) error {
+	return s.repo.Remittance(idFrom,idTo,sum, description)
 }
 
 func (s *FinanceService) Balance(id int) (float64 , error) {

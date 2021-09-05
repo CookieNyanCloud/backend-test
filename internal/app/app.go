@@ -17,7 +17,6 @@ import (
 	"time"
 )
 
-//todo:readme
 //todo:docker
 //todo:tests
 //todo:checks for data(tags)
@@ -26,6 +25,7 @@ import (
 //todo:uuid?
 //todo:money types?
 
+//readme
 //transactions sort+pagination
 //no init users?
 
