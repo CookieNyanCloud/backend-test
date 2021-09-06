@@ -78,7 +78,7 @@ API_KEY=
 ```
 
 # транзакции
-- GET `http://localhost:8090/api/v1/operation/transactionsList?sort=sum&dir=asc&page=1`
+- GET `http://localhost:8090/api/v1/operation/transactionsList`
 - GET `http://localhost:8090/api/v1/operation/transactionsList?sort=sum&dir=asc&page=1`
 - на входе обязательно id(целое число), в параметрах указывается поле сортировки, направление и страница(по умолчанию дата по возрастанию, страница включает в себя 5 записей в json)
 ```json

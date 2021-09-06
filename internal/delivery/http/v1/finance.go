@@ -8,9 +8,8 @@ import (
 	"net/http"
 )
 
-
-
 func (h *Handler) initFinanceRoutes(api *gin.RouterGroup) {
+	//пути к операциям
 	operation := api.Group("/operation")
 	{
 		operation.POST("/transaction", h.transaction)
@@ -25,29 +24,26 @@ const (
 	Success = "удачная транзакция"
 )
 
-
 type transactionInput struct {
-	Id  int `json:"id" binding:"required"`
-	Sum float64    `json:"sum" binding:"required"`
-	Description string `json:"description"`
+	Id          int     `json:"id" binding:"required"`
+	Sum         float64 `json:"sum" binding:"required"`
+	Description string  `json:"description"`
 }
 
 type remittanceInput struct {
-	IdFrom int `json:"id_from" binding:"required"`
-	IdTo   int `json:"id_to" binding:"required"`
-	Sum    float64    `json:"sum" binding:"required"`
-	Description string `json:"description"`
+	IdFrom      int     `json:"id_from" binding:"required"`
+	IdTo        int     `json:"id_to" binding:"required"`
+	Sum         float64 `json:"sum" binding:"required"`
+	Description string  `json:"description"`
 }
 
 type balanceInput struct {
-	Id  int `json:"id" binding:"required"`
+	Id int `json:"id" binding:"required"`
 }
 
 type transactionsListInput struct {
-	Id  int `json:"id" binding:"required"`
+	Id int `json:"id" binding:"required"`
 }
-
-
 
 func (h *Handler) transaction(c *gin.Context) {
 
@@ -59,8 +55,7 @@ func (h *Handler) transaction(c *gin.Context) {
 	}
 
 	//передача данных
-
-	if err := h.services.Transaction(inp.Id, inp.Sum, inp.Description);err!= nil {
+	if err := h.services.Transaction(inp.Id, inp.Sum, inp.Description); err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -77,7 +72,7 @@ func (h *Handler) remittance(c *gin.Context) {
 	}
 
 	//передача данных
-	if err := h.services.Remittance(inp.IdFrom,inp.IdTo,inp.Sum,inp.Description);err!= nil {
+	if err := h.services.Remittance(inp.IdFrom, inp.IdTo, inp.Sum, inp.Description); err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -86,14 +81,16 @@ func (h *Handler) remittance(c *gin.Context) {
 }
 
 func (h *Handler) balance(c *gin.Context) {
-	cur:=c.DefaultQuery("currency", "RUB")
+	cur := c.DefaultQuery("currency", "RUB")
 	var inp balanceInput
+	//проверка данных для структуры
 	if err := c.BindJSON(&inp); err != nil {
 		newResponse(c, http.StatusBadRequest, "неверные данные")
 		return
 	}
-	balance ,err:= h.services.Balance(inp.Id)
-	if err!=nil{
+	//передача данных
+	balance, err := h.services.Balance(inp.Id)
+	if err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -105,36 +102,37 @@ func (h *Handler) balance(c *gin.Context) {
 		return
 	}
 
-	balanceInCur, err:= h.curService.GetCur(cur,balance)
-	if err!=nil{
+	balanceInCur, err := h.curService.GetCur(cur, balance)
+	if err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	c.JSON(http.StatusOK, BalanceResponse{
-		Balance:balanceInCur,
+		Balance: balanceInCur,
 		Cur:     cur,
 	})
 }
 
 func (h *Handler) transactionsList(c *gin.Context) {
 
-
-	sort:=c.DefaultQuery("sort", "date")
-	dir:=c.DefaultQuery("dir", "ASC")
-	page, err:=strconv.Atoi(c.DefaultQuery("page", "0"))
-	if err!=nil{
+	sort := c.DefaultQuery("sort", "date")
+	dir := c.DefaultQuery("dir", "ASC")
+	page, err := strconv.Atoi(c.DefaultQuery("page", "0"))
+	if err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	var inp transactionsListInput
+	//проверка данных для структуры
 	if err := c.BindJSON(&inp); err != nil {
 		newResponse(c, http.StatusBadRequest, "неверные данные")
 		return
 	}
-	list ,err:= h.services.GetTransactionsList(inp.Id,sort,dir,page)
-	if err!=nil{
+	//передача данных
+	list, err := h.services.GetTransactionsList(inp.Id, sort, dir, page)
+	if err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}

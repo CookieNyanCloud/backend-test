@@ -4,6 +4,8 @@ import (
 	"github.com/cookienyancloud/avito-backend-test/internal/repository"
 )
 
+//прослойка для связи с базой данных
+
 type FinanceService struct {
 	repo repository.Finance
 }
@@ -12,34 +14,25 @@ func NewFinanceService(repo repository.Finance) *FinanceService {
 	return &FinanceService{repo}
 }
 
-//type transactionsList struct {
-//	Id          int
-//	Operation   string
-//	Sum         float64
-//	Date        time.Time
-//	Description string
-//	IdTo        int
-//}
-
 type Finance interface {
-	Transaction(id int, sum float64 ,description string) error
-	Remittance(idFrom int, idTo int, sum string, description string ) error
-	Balance(id int ) (float64 , error)
-	GetTransactionsList(id int, sort string,dir string, page int) ([]repository.TransactionsList, error)
+	Transaction(id int, sum float64, description string) error
+	Remittance(idFrom int, idTo int, sum string, description string) error
+	Balance(id int) (float64, error)
+	GetTransactionsList(id int, sort string, dir string, page int) ([]repository.TransactionsList, error)
 }
 
-func (s *FinanceService) Transaction(id int, sum float64,description string ) error {
-	return s.repo.Transaction(id, sum,description)
+func (s *FinanceService) Transaction(id int, sum float64, description string) error {
+	return s.repo.Transaction(id, sum, description)
 }
 
-func (s *FinanceService) Remittance(idFrom int, idTo int, sum float64,description string ) error {
-	return s.repo.Remittance(idFrom,idTo,sum, description)
+func (s *FinanceService) Remittance(idFrom int, idTo int, sum float64, description string) error {
+	return s.repo.Remittance(idFrom, idTo, sum, description)
 }
 
-func (s *FinanceService) Balance(id int) (float64 , error) {
+func (s *FinanceService) Balance(id int) (float64, error) {
 	return s.repo.Balance(id)
 }
 
-func (s *FinanceService) GetTransactionsList(id int, sort string,dir string, page int) ([]repository.TransactionsList, error){
-	return s.repo.GetTransactionsList(id,sort,dir,page)
+func (s *FinanceService) GetTransactionsList(id int, sort string, dir string, page int) ([]repository.TransactionsList, error) {
+	return s.repo.GetTransactionsList(id, sort, dir, page)
 }

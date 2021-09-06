@@ -5,25 +5,12 @@ import (
 	"time"
 )
 
-//значкения по умолчанию
-var (
-	defaults = map[string]interface{}{
-		"defaultHttpPort":               "8000",
-		"defaultHttpRWTimeout":          10 * time.Second,
-		"defaultHttpMaxHeaderMegabytes": 1,
-		"defaultLimiterRPS":             10,
-		"defaultLimiterBurst":           2,
-		"defaultLimiterTTL":             10 * time.Minute,
-	}
-)
-
 //конфигурации
 type (
 	Config struct {
 		Postgres PostgresConfig
 		HTTP     HTTPConfig
-		Limiter  LimiterConfig
-		ApiKey string
+		ApiKey   string
 	}
 
 	PostgresConfig struct {
@@ -48,15 +35,9 @@ type (
 		Burst int
 		TTL   time.Duration
 	}
-
 )
 
 func Init(configDir string) (*Config, error) {
-
-	//заполнение значений по умолчанию
-	for k, v := range defaults {
-		viper.SetDefault(k, v)
-	}
 
 	//чтение данных из файла конфигураций
 	viper.AddConfigPath(configDir)
@@ -89,9 +70,6 @@ func unmarshal(cfg *Config) error {
 		return err
 	}
 	if err := viper.UnmarshalKey("http", &cfg.HTTP); err != nil {
-		return err
-	}
-	if err := viper.UnmarshalKey("limiter", &cfg.Limiter); err != nil {
 		return err
 	}
 	return nil

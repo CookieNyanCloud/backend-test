@@ -1,9 +1,8 @@
 package main
 
-import(
+import (
 	"github.com/cookienyancloud/avito-backend-test/internal/app"
 	_ "github.com/lib/pq"
-
 )
 
 const configsDir = "configs"

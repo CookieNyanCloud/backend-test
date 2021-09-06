@@ -24,19 +24,15 @@ type TransactionsList struct {
 	IdTo        int       `json:"id_to" db:"user_to"`
 }
 
-
 type Finance interface {
+	//основные методы
 	Transaction(id int, sum float64, description string) error
 	Remittance(idFrom int, idTo int, sum float64, description string) error
 	Balance(id int) (float64, error)
-
+	GetTransactionsList(id int, sort string, dir string, page int) ([]TransactionsList, error)
+	//вспомогательные
 	NewUser(id int, sum float64) error
 	NewTransaction(idFrom int, operation string, sum float64, idTo int, description string) error
-	GetTransactionsList(id int, sort string,dir string, page int) ([]TransactionsList, error)
-}
-
-func (r *FinanceRepo) NewFinanceRepo(db *sqlx.DB) *FinanceRepo {
-	return &FinanceRepo{db: db}
 }
 
 const (
@@ -56,23 +52,27 @@ const (
 	remittance  = "remittance"
 )
 
-func (r *FinanceRepo) Transaction(id int, sum float64,description string) error {
-
+func (r *FinanceRepo) Transaction(id int, sum float64, description string) error {
+	//получение баланса
 	currentBalance, err := r.Balance(id)
 	if err != nil {
+		//проверка на причину ошибка
 		if err.Error() == noUserTxt && sum > 0 {
+			//нет пользователя, создаем и начисляем
 			err = r.NewUser(id, sum)
 			if err != nil {
 				return err
 			}
-			err = r.NewTransaction(id, transaction, sum, -1,description)
+			//начисление записываем
+			err = r.NewTransaction(id, transaction, sum, -1, description)
 			if err != nil {
 				return err
 			}
 		}
+		//иная ошибка
 		return err
 	}
-
+	//новый баланс и его проверка
 	newBalance := currentBalance + sum
 	if newBalance >= 0 {
 		query := fmt.Sprintf("UPDATE %s SET balance = $1  WHERE id = $2", financeTable)
@@ -89,31 +89,34 @@ func (r *FinanceRepo) Transaction(id int, sum float64,description string) error 
 	return errors.New(Minus)
 }
 
-func (r *FinanceRepo) Remittance(idFrom int, idTo int, sum float64,description string) error {
+func (r *FinanceRepo) Remittance(idFrom int, idTo int, sum float64, description string) error {
+	//проверка баланса отправителя
 	currentBalanceFrom, err := r.Balance(idFrom)
 	if err != nil {
 		if err.Error() == noUser {
+			//пользователя нет
 			return errors.New(noSense)
 		}
+		//иная ошибка
 		return err
 	}
-
+	//проверка баланса получателя
 	currentBalanceTo, err := r.Balance(idTo)
 	if err != nil && err.Error() != noUserTxt {
-		println("DS")
+		//иная ошибка
 		return err
 	}
 	if err != nil && err.Error() == noUserTxt {
+		//создание получателя
 		err = r.NewUser(idTo, 0)
 		currentBalanceTo = 0
 		if err != nil {
 			return err
 		}
 	}
-
+	//новые балансы и проверка
 	newBalanceFrom := currentBalanceFrom - sum
 	newBalanceTo := currentBalanceTo + sum
-
 	if newBalanceFrom >= 0 {
 		query := fmt.Sprintf("UPDATE %s SET balance = $1  WHERE id = $2",
 			financeTable)
@@ -129,7 +132,7 @@ func (r *FinanceRepo) Remittance(idFrom int, idTo int, sum float64,description s
 			return err
 		}
 
-		err = r.NewTransaction(idFrom, remittance, sum, idTo,description)
+		err = r.NewTransaction(idFrom, remittance, sum, idTo, description)
 		if err != nil {
 			return err
 		}
@@ -145,6 +148,7 @@ func (r *FinanceRepo) Balance(id int) (float64, error) {
 	err := r.db.Get(&currentBalance, query, id)
 	if err != nil {
 		if err.Error() == noUser {
+			//сообщение об отсутствии пользователя
 			return -1, errors.New(noUserTxt)
 		}
 		return -1, err
@@ -153,6 +157,7 @@ func (r *FinanceRepo) Balance(id int) (float64, error) {
 }
 
 func (r *FinanceRepo) NewUser(id int, sum float64) error {
+	//создание пользователя
 	query := fmt.Sprintf("INSERT INTO %s (id, balance) values ($1, $2)",
 		financeTable)
 	_, err := r.db.Exec(query, id, sum)
@@ -163,7 +168,8 @@ func (r *FinanceRepo) NewUser(id int, sum float64) error {
 	return nil
 }
 
-func (r *FinanceRepo) NewTransaction(idFrom int, operation string, sum float64, idTo int,description string) error {
+func (r *FinanceRepo) NewTransaction(idFrom int, operation string, sum float64, idTo int, description string) error {
+	//проверка на наличие получателя, создание соответствующей записи
 	if idTo > 0 {
 		query := fmt.Sprintf("INSERT INTO %s (user_id, operation,sum, user_to, description) values ($1, $2, $3, $4, $5)",
 			transactionTable)
@@ -182,11 +188,16 @@ func (r *FinanceRepo) NewTransaction(idFrom int, operation string, sum float64, 
 	return nil
 }
 
-func (r *FinanceRepo) GetTransactionsList(id int, sort string,dir string, page int) ([]TransactionsList, error) {
+func (r *FinanceRepo) GetTransactionsList(id int, sort string, dir string, page int) ([]TransactionsList, error) {
 	var list []TransactionsList
-	limit:= 5
-	offset:=limit*(page-1)
-	query := fmt.Sprintf(`SELECT * FROM %s WHERE user_id=$1 ORDER BY "%s"  %s LIMIT %d OFFSET %d`, transactionTable,sort, dir, limit, offset)
+	//пагинация
+	limit := 5
+	offset := limit * (page - 1)
+	if offset < 0 {
+		offset = 0
+	}
+	//создание списка
+	query := fmt.Sprintf(`SELECT * FROM %s WHERE user_id=$1 ORDER BY "%s"  %s LIMIT %d OFFSET %d`, transactionTable, sort, dir, limit, offset)
 	err := r.db.Select(&list, query, id)
 	if err != nil {
 		return []TransactionsList{}, err

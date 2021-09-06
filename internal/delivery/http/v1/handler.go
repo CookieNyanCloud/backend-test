@@ -5,15 +5,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+//хэндлер с двумя сервисами, работы с финансами и работы с курсом
 type Handler struct {
-	services     *service.FinanceService
-	curService  service.CurService
+	services   *service.FinanceService
+	curService service.CurService
 }
 
 func NewHandler(services *service.FinanceService, curService service.CurService) *Handler {
 	return &Handler{
-		services:     services,
-		curService:curService,
+		services:   services,
+		curService: curService,
 	}
 }
 
