@@ -207,7 +207,7 @@ func (r *FinanceRepo) GetTransactionsList(id int, sort string, dir string, page 
 	if offset < 0 {
 		offset = 0
 	}
-	//создание списка
+	//создание списка, ограничение непустыми записями
 	query := fmt.Sprintf(`SELECT * FROM %s WHERE user_id=$1 OR user_to=$2 ORDER BY "%s"  %s LIMIT %d OFFSET %d`, transactionTable, sort, dir, limit, offset)
 	err := r.db.Select(&toVal, query, id, id)
 	if err != nil || len(toVal) == 0 {

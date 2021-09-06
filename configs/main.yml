@@ -1,12 +1,13 @@
 postgres:
-  host:     "localhost"
+  host:     "db"
+#  local:    "localhost"
   port:     "5432"
   username: "postgres"
   dbname:   "postgres"
   SSLMode:  "disable"
 
 http:
-  port: 8090
+  port:           8090
   maxHeaderBytes: 1
-  readTimeout: 10s
-  writeTimeout: 10s
+  readTimeout:    10s
+  writeTimeout:   10s

@@ -60,7 +60,7 @@ func Init(configDir string) (*Config, error) {
 	}
 
 	//заполняем структуру значениями из .env
-	cfg.Postgres.Password = viper.GetString("postgres_pass")
+	cfg.Postgres.Password = viper.GetString("postgres_password")
 	cfg.ApiKey = viper.GetString("api_key")
 	return &cfg, nil
 }
