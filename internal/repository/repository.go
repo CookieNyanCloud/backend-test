@@ -1,9 +1,11 @@
 package repository
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"strconv"
 	"time"
 )
 
@@ -20,8 +22,17 @@ type TransactionsList struct {
 	Operation   string    `json:"operation"db:"operation"`
 	Sum         float64   `json:"sum" db:"sum"`
 	Date        time.Time `json:"date" db:"date"`
-	Description string    `json:"description" db:"description"`
-	IdTo        int       `json:"id_to" db:"user_to"`
+	Description string    `json:"description,omitempty" db:"description"`
+	IdTo        string    `json:"id_to,omitempty" db:"user_to"`
+}
+
+type listToValidate struct {
+	Id          int           `json:"id" db:"user_id"`
+	Operation   string        `json:"operation"db:"operation"`
+	Sum         float64       `json:"sum" db:"sum"`
+	Date        time.Time     `json:"date" db:"date"`
+	Description string        `json:"description,omitempty" db:"description"`
+	IdTo        sql.NullInt64 `json:"id_to,omitempty" db:"user_to"`
 }
 
 type Finance interface {
@@ -170,15 +181,15 @@ func (r *FinanceRepo) NewUser(id int, sum float64) error {
 
 func (r *FinanceRepo) NewTransaction(idFrom int, operation string, sum float64, idTo int, description string) error {
 	//проверка на наличие получателя, создание соответствующей записи
-	if idTo > 0 {
-		query := fmt.Sprintf("INSERT INTO %s (user_id, operation,sum, user_to, description) values ($1, $2, $3, $4, $5)",
+	if operation == remittance {
+		query := fmt.Sprintf("INSERT INTO %s (user_id, operation, sum, user_to, description) values ($1, $2, $3, $4, $5)",
 			transactionTable)
 		_, err := r.db.Exec(query, idFrom, operation, sum, idTo, description)
 		if err != nil {
 			return err
 		}
 	} else {
-		query := fmt.Sprintf("INSERT INTO %s (user_id, operation, sum, user_to, description) values ($1, $2, $3, -1,$4)",
+		query := fmt.Sprintf("INSERT INTO %s (user_id, operation, sum, description) values ($1, $2, $3, $4)",
 			transactionTable)
 		_, err := r.db.Exec(query, idFrom, operation, sum, description)
 		if err != nil {
@@ -189,7 +200,8 @@ func (r *FinanceRepo) NewTransaction(idFrom int, operation string, sum float64, 
 }
 
 func (r *FinanceRepo) GetTransactionsList(id int, sort string, dir string, page int) ([]TransactionsList, error) {
-	var list []TransactionsList
+	list := make([]TransactionsList, 5)
+	var toVal []listToValidate
 	//пагинация
 	limit := 5
 	offset := limit * (page - 1)
@@ -198,9 +210,22 @@ func (r *FinanceRepo) GetTransactionsList(id int, sort string, dir string, page 
 	}
 	//создание списка
 	query := fmt.Sprintf(`SELECT * FROM %s WHERE user_id=$1 ORDER BY "%s"  %s LIMIT %d OFFSET %d`, transactionTable, sort, dir, limit, offset)
-	err := r.db.Select(&list, query, id)
+	err := r.db.Select(&toVal, query, id)
 	if err != nil {
 		return []TransactionsList{}, err
+	}
+	//валидация поля id получателя
+	for i := 0; i < 5; i++ {
+		list[i].Id = toVal[i].Id
+		list[i].Operation = toVal[i].Operation
+		list[i].Sum = toVal[i].Sum
+		list[i].Date = toVal[i].Date
+		list[i].Description = toVal[i].Description
+		if toVal[i].IdTo.Valid {
+			list[i].IdTo = strconv.FormatInt(toVal[i].IdTo.Int64, 10)
+		} else {
+			list[i].IdTo = ""
+		}
 	}
 	return list, nil
 }

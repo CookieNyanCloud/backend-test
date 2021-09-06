@@ -17,15 +17,16 @@ import (
 	"time"
 )
 
-//todo:docker
-//todo:tests
 //todo:checks for data(tags)
 //todo:precision
-//todo:comments
+//todo:docker
+//todo:tests
 
+//todo:swagger?
 //todo:money types?
 //todo:uuid?
 
+//comments
 //readme
 //transactions sort+pagination
 //no init users?

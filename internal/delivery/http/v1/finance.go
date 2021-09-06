@@ -25,24 +25,24 @@ const (
 )
 
 type transactionInput struct {
-	Id          int     `json:"id" binding:"required"`
+	Id          int     `json:"id" binding:"required,gt=0"`
 	Sum         float64 `json:"sum" binding:"required"`
-	Description string  `json:"description"`
+	Description string  `json:"description" binding:"max=20"`
 }
 
 type remittanceInput struct {
-	IdFrom      int     `json:"id_from" binding:"required"`
-	IdTo        int     `json:"id_to" binding:"required"`
-	Sum         float64 `json:"sum" binding:"required"`
-	Description string  `json:"description"`
+	IdFrom      int     `json:"id_from" binding:"required,gt=0"`
+	IdTo        int     `json:"id_to" binding:"required,gt=0"`
+	Sum         float64 `json:"sum" binding:"required,gt=0"`
+	Description string  `json:"description" binding:"max=20"`
 }
 
 type balanceInput struct {
-	Id int `json:"id" binding:"required"`
+	Id int `json:"id" binding:"required,gt=0"`
 }
 
 type transactionsListInput struct {
-	Id int `json:"id" binding:"required"`
+	Id int `json:"id" binding:"required,gt=0"`
 }
 
 func (h *Handler) transaction(c *gin.Context) {

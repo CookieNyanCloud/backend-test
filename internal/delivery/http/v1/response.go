@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"database/sql"
 	"github.com/cookienyancloud/avito-backend-test/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"time"
@@ -16,12 +17,12 @@ type BalanceResponse struct {
 	Cur     string `json:"cur"`
 }
 type TransactionsListResponse struct {
-	Id          int       `json:"id" db:"user_id"`
-	Operation   string    `json:"operation"db:"operation"`
-	Sum         float64   `json:"sum" db:"sum"`
-	Date        time.Time `json:"date" db:"date"`
-	Description string    `json:"description" db:"description"`
-	IdTo        int       `json:"id_to" db:"user_to"`
+	Id          int           `json:"id" db:"user_id"`
+	Operation   string        `json:"operation"db:"operation"`
+	Sum         float64       `json:"sum" db:"sum"`
+	Date        time.Time     `json:"date" db:"date"`
+	Description string        `json:"description,omitempty" db:"description"`
+	IdTo        sql.NullInt64 `json:"id_to,omitempty" db:"user_to"`
 }
 
 func newResponse(c *gin.Context, statusCode int, message string) {
