@@ -200,22 +200,21 @@ func (r *FinanceRepo) NewTransaction(idFrom int, operation string, sum float64, 
 }
 
 func (r *FinanceRepo) GetTransactionsList(id int, sort string, dir string, page int) ([]TransactionsList, error) {
-	list := make([]TransactionsList, 5)
+	limit := 5
 	var toVal []listToValidate
 	//пагинация
-	limit := 5
 	offset := limit * (page - 1)
 	if offset < 0 {
 		offset = 0
 	}
 	//создание списка
-	query := fmt.Sprintf(`SELECT * FROM %s WHERE user_id=$1 ORDER BY "%s"  %s LIMIT %d OFFSET %d`, transactionTable, sort, dir, limit, offset)
-	err := r.db.Select(&toVal, query, id)
-	if err != nil {
+	query := fmt.Sprintf(`SELECT * FROM %s WHERE user_id=$1 OR user_to=$2 ORDER BY "%s"  %s LIMIT %d OFFSET %d`, transactionTable, sort, dir, limit, offset)
+	err := r.db.Select(&toVal, query, id, id)
+	if err != nil || len(toVal) == 0 {
 		return []TransactionsList{}, err
 	}
-	//валидация поля id получателя
-	for i := 0; i < limit; i++ {
+	list := make([]TransactionsList, len(toVal))
+	for i := 0; i < len(toVal); i++ {
 		list[i].Id = toVal[i].Id
 		list[i].Operation = toVal[i].Operation
 		list[i].Sum = toVal[i].Sum
@@ -227,5 +226,6 @@ func (r *FinanceRepo) GetTransactionsList(id int, sort string, dir string, page 
 			list[i].IdTo = ""
 		}
 	}
+
 	return list, nil
 }
