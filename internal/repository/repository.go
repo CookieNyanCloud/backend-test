@@ -215,7 +215,7 @@ func (r *FinanceRepo) GetTransactionsList(id int, sort string, dir string, page 
 		return []TransactionsList{}, err
 	}
 	//валидация поля id получателя
-	for i := 0; i < 5; i++ {
+	for i := 0; i < limit; i++ {
 		list[i].Id = toVal[i].Id
 		list[i].Operation = toVal[i].Operation
 		list[i].Sum = toVal[i].Sum

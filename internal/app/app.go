@@ -17,19 +17,14 @@ import (
 	"time"
 )
 
-//todo:checks for data(tags)
-//todo:precision
 //todo:docker
 //todo:tests
+//todo:precision
 
 //todo:swagger?
-//todo:money types?
 //todo:uuid?
+//todo:money types?
 
-//comments
-//readme
-//transactions sort+pagination
-//no init users?
 
 func Run(configPath string) {
 
