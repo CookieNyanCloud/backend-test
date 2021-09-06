@@ -1,6 +1,6 @@
 
 run:
-	go run cmd/main.go
+	go run cmd/main.go -local
 
 push:
 	git push origin master

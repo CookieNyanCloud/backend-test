@@ -6,10 +6,11 @@
 
 - Пароль к базе дынных и ключь к api для выдачи курса валют в .env файле
 ```dotenv
-POSTGRES_PASS=
+POSTGRES_PASSWORD=
 API_KEY=
+host=
  ```
-- для локального запуска `make run` 
+- для локального запуска `make run` (go run cmd/main.go -local флаг позволяет отличить хост и его источник)
 
 ### Docker
 

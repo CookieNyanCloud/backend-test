@@ -37,7 +37,7 @@ type (
 	}
 )
 
-func Init(configDir string) (*Config, error) {
+func Init(configDir string, local bool) (*Config, error) {
 
 	//чтение данных из файла конфигураций
 	viper.AddConfigPath(configDir)
@@ -62,6 +62,9 @@ func Init(configDir string) (*Config, error) {
 	//заполняем структуру значениями из .env
 	cfg.Postgres.Password = viper.GetString("postgres_password")
 	cfg.ApiKey = viper.GetString("api_key")
+	if !local {
+		cfg.Postgres.Host = viper.GetString("host")
+	}
 	return &cfg, nil
 }
 

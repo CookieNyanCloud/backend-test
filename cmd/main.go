@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"github.com/cookienyancloud/avito-backend-test/internal/app"
 	_ "github.com/lib/pq"
 )
@@ -8,5 +9,9 @@ import (
 const configsDir = "configs"
 
 func main() {
-	app.Run(configsDir)
+	var local bool
+	flag.BoolVar(&local, "local",false,"хост")
+	flag.Parse()
+	println(local)
+	app.Run(configsDir, local)
 }

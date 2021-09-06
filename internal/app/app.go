@@ -26,10 +26,10 @@ import (
 //todo:money types?
 
 
-func Run(configPath string) {
+func Run(configPath string, local bool) {
 
 	//подтягиваем значения переменных из папки конфигураций и .env
-	cfg, err := config.Init(configPath)
+	cfg, err := config.Init(configPath, local)
 	if err != nil {
 		logger.Errorf("ошибка инициализации переменных:%v",err)
 		return

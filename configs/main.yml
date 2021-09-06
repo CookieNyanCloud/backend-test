@@ -1,6 +1,7 @@
 postgres:
-  host:     "db"
-#  local:    "localhost"
+#  local
+  host:     "localhost"
+#  local and/or docker
   port:     "5432"
   username: "postgres"
   dbname:   "postgres"
