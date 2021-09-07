@@ -12,12 +12,12 @@ build:
 	docker build -t avito-backend-test .
 
 dockerrun:
-	docker run --name=avito-backend -p 8090:8090 --rm avito-backend
+	docker run --name=avito-backend-test -p 8090:8090 --rm avito-backend-test
 
 upbuild:
-	docker-compose up --build avito-backend
+	docker-compose up --build avito-backend-test
 up:
-	docker-compose up avito-backend
+	docker-compose up avito-backend-test
 down:
 	docker-compose down
 

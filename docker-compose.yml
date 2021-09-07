@@ -2,12 +2,12 @@ version: '3.8'
 
 services:
   avito-backend-test:
+    image: avito-backend-test
+    container_name: avito-backend-test
     build: ./
-      #context: .
-      #dockerfile: Dockerfile
     command: ./wait-for-postgres.sh db ./avito-backend-test
     ports:
-    - 8090:8090
+      - 8090:8090
     depends_on:
       - db
     env_file:
