@@ -17,7 +17,6 @@ import (
 	"time"
 )
 
-//todo:docker
 //todo:tests
 //todo:precision
 

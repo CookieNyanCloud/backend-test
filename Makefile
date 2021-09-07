@@ -22,17 +22,4 @@ up:
 down:
 	docker-compose down
 
-#createdb:
-#	docker exec -it avito-backend-test_db_1 createdb --username=postgres postgres
-
-#migrateup:
-#	#migrate -path avito-backend-test/schema -database "postgres" -verbose up
-#	docker run -v {{ migration dir }}:/migrations --network host migrate/migrate
-#    -path=/migrations/ -database postgres://localhost:5432/database up 2
-#
-#
-#migratedown:
-#	migrate -path avito-backend-test/schema -database "postgres" -verbose down
-
-
 .PHONY: run push prune build dockerrun upbuild up down

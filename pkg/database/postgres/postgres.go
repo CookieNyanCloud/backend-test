@@ -25,6 +25,8 @@ func NewClient(cfg config.PostgresConfig) (*sqlx.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	//выполнение схемы
 	path:=filepath.Join("schema","000001_init_schema.up.sql")
 	c, ioErr := ioutil.ReadFile(path)
 	if ioErr != nil {
