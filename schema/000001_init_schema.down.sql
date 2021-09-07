@@ -1,2 +1,2 @@
-DROP TABLE transactions;
-DROP TABLE userbalance;
+DROP TABLE IF EXISTS transactions;
+DROP TABLE IF EXISTS userbalance;

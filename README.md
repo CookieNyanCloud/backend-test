@@ -8,7 +8,7 @@
 ```dotenv
 POSTGRES_PASSWORD=
 API_KEY=
-host=
+host=db
  ```
 - для локального запуска `make run` (go run cmd/main.go -local флаг позволяет отличить хост и его источник)
 

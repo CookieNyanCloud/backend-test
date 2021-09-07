@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/cookienyancloud/avito-backend-test/internal/config"
 	"github.com/jmoiron/sqlx"
+	"io/ioutil"
+	"path/filepath"
 )
 
 //создание клиента бд
@@ -23,5 +25,13 @@ func NewClient(cfg config.PostgresConfig) (*sqlx.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+	path:=filepath.Join("schema","000001_init_schema.up.sql")
+	c, ioErr := ioutil.ReadFile(path)
+	if ioErr != nil {
+		return nil, err
+	}
+	sql:= string(c)
+	sqlx.MustExec(db,sql)
+
 	return db, nil
 }
