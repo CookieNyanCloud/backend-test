@@ -1,25 +1,22 @@
-
+#локально
 run:
 	go run cmd/main.go -local
-
+#гит
 push:
 	git push origin master
 
-prune:
-	docker container prune
-
-build:
-	docker build -t avito-backend-test .
-
-dockerrun:
-	docker run --name=avito-backend-test -p 8090:8090 --rm avito-backend-test
-
+#докер
 upbuild:
 	docker-compose up --build avito-backend-test
-
 up:
 	docker-compose up avito-backend-test
+build:
+	docker build -t avito-backend-test .
+prune:
+	docker container prune
+dockerrun:
+	docker run --name=avito-backend-test -p 8090:8090 --rm avito-backend-test
 down:
-	docker-compose down
+	docker-compose down avito-backend-test
 
 .PHONY: run push prune build dockerrun upbuild up down
