@@ -2,3 +2,5 @@
 .env
 .vscode
 .database
+mock.go
+finance_test.go

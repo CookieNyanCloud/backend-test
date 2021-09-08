@@ -7,6 +7,7 @@ import (
 
 //прослойка для связи с базой данных
 
+
 type FinanceService struct {
 	repo repository.Finance
 }
