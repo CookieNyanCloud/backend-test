@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"strconv"
 	"time"
@@ -18,7 +19,7 @@ func NewFinanceRepo(db *sqlx.DB) *FinanceRepo {
 }
 
 type TransactionsList struct {
-	Id          int       `json:"id" db:"user_id"`
+	Id          uuid.UUID       `json:"id" db:"user_id"`
 	Operation   string    `json:"operation"db:"operation"`
 	Sum         float64   `json:"sum" db:"sum"`
 	Date        time.Time `json:"date" db:"date"`
@@ -27,7 +28,7 @@ type TransactionsList struct {
 }
 
 type listToValidate struct {
-	Id          int           `json:"id" db:"user_id"`
+	Id          uuid.UUID           `json:"id" db:"user_id"`
 	Operation   string        `json:"operation"db:"operation"`
 	Sum         float64       `json:"sum" db:"sum"`
 	Date        time.Time     `json:"date" db:"date"`
@@ -37,13 +38,13 @@ type listToValidate struct {
 
 type Finance interface {
 	//основные методы
-	Transaction(id int, sum float64, description string) error
-	Remittance(idFrom int, idTo int, sum float64, description string) error
-	Balance(id int) (float64, error)
-	GetTransactionsList(id int, sort string, dir string, page int) ([]TransactionsList, error)
+	Transaction(id uuid.UUID, sum float64, description string) error
+	Remittance(idFrom uuid.UUID, idTo uuid.UUID, sum float64, description string) error
+	Balance(id uuid.UUID) (float64, error)
+	GetTransactionsList(id uuid.UUID, sort string, dir string, page int) ([]TransactionsList, error)
 	//вспомогательные
-	NewUser(id int, sum float64) error
-	NewTransaction(idFrom int, operation string, sum float64, idTo int, description string) error
+	NewUser(id uuid.UUID, sum float64) error
+	NewTransaction(idFrom uuid.UUID, operation string, sum float64, idTo uuid.UUID, description string) error
 }
 
 const (
@@ -63,7 +64,7 @@ const (
 	remittance  = "remittance"
 )
 
-func (r *FinanceRepo) Transaction(id int, sum float64, description string) error {
+func (r *FinanceRepo) Transaction(id uuid.UUID, sum float64, description string) error {
 	//получение баланса
 	currentBalance, err := r.Balance(id)
 	if err != nil {
@@ -75,7 +76,7 @@ func (r *FinanceRepo) Transaction(id int, sum float64, description string) error
 				return err
 			}
 			//начисление записываем
-			err = r.NewTransaction(id, transaction, sum, -1, description)
+			err = r.NewTransaction(id, transaction, sum, uuid.Nil, description)
 			if err != nil {
 				return err
 			}
@@ -91,7 +92,7 @@ func (r *FinanceRepo) Transaction(id int, sum float64, description string) error
 		if err != nil {
 			return err
 		}
-		err = r.NewTransaction(id, transaction, sum, -1, description)
+		err = r.NewTransaction(id, transaction, sum, uuid.Nil, description)
 		if err != nil {
 			return err
 		}
@@ -100,7 +101,7 @@ func (r *FinanceRepo) Transaction(id int, sum float64, description string) error
 	return errors.New(Minus)
 }
 
-func (r *FinanceRepo) Remittance(idFrom int, idTo int, sum float64, description string) error {
+func (r *FinanceRepo) Remittance(idFrom uuid.UUID, idTo uuid.UUID, sum float64, description string) error {
 	//проверка баланса отправителя
 	currentBalanceFrom, err := r.Balance(idFrom)
 	if err != nil {
@@ -153,7 +154,7 @@ func (r *FinanceRepo) Remittance(idFrom int, idTo int, sum float64, description 
 	return errors.New(Minus)
 }
 
-func (r *FinanceRepo) Balance(id int) (float64, error) {
+func (r *FinanceRepo) Balance(id uuid.UUID) (float64, error) {
 	var currentBalance float64
 	query := fmt.Sprintf(`SELECT balance FROM %s WHERE id=$1`, financeTable)
 	err := r.db.Get(&currentBalance, query, id)
@@ -167,7 +168,7 @@ func (r *FinanceRepo) Balance(id int) (float64, error) {
 	return currentBalance, nil
 }
 
-func (r *FinanceRepo) NewUser(id int, sum float64) error {
+func (r *FinanceRepo) NewUser(id uuid.UUID, sum float64) error {
 	//создание пользователя
 	query := fmt.Sprintf("INSERT INTO %s (id, balance) values ($1, $2)",
 		financeTable)
@@ -179,7 +180,7 @@ func (r *FinanceRepo) NewUser(id int, sum float64) error {
 	return nil
 }
 
-func (r *FinanceRepo) NewTransaction(idFrom int, operation string, sum float64, idTo int, description string) error {
+func (r *FinanceRepo) NewTransaction(idFrom uuid.UUID, operation string, sum float64, idTo uuid.UUID, description string) error {
 	//проверка на наличие получателя, создание соответствующей записи
 	if operation == remittance {
 		query := fmt.Sprintf("INSERT INTO %s (user_id, operation, sum, user_to, description) values ($1, $2, $3, $4, $5)",
@@ -199,7 +200,7 @@ func (r *FinanceRepo) NewTransaction(idFrom int, operation string, sum float64, 
 	return nil
 }
 
-func (r *FinanceRepo) GetTransactionsList(id int, sort string, dir string, page int) ([]TransactionsList, error) {
+func (r *FinanceRepo) GetTransactionsList(id uuid.UUID, sort string, dir string, page int) ([]TransactionsList, error) {
 	limit := 5
 	var toVal []listToValidate
 	//пагинация
