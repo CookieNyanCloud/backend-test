@@ -17,7 +17,7 @@ func NewFinanceRepo(db *sqlx.DB) *FinanceRepo {
 }
 
 type TransactionsList struct {
-	Id          uuid.UUID       `json:"id" db:"user_id"`
+	Id          uuid.UUID `json:"id" db:"user_id"`
 	Operation   string    `json:"operation"db:"operation"`
 	Sum         float64   `json:"sum" db:"sum"`
 	Date        time.Time `json:"date" db:"date"`
@@ -26,11 +26,11 @@ type TransactionsList struct {
 }
 
 type listToValidate struct {
-	Id          uuid.UUID           `json:"id" db:"user_id"`
-	Operation   string        `json:"operation"db:"operation"`
-	Sum         float64       `json:"sum" db:"sum"`
-	Date        time.Time     `json:"date" db:"date"`
-	Description string        `json:"description,omitempty" db:"description"`
+	Id          uuid.UUID `json:"id" db:"user_id"`
+	Operation   string    `json:"operation"db:"operation"`
+	Sum         float64   `json:"sum" db:"sum"`
+	Date        time.Time `json:"date" db:"date"`
+	Description string    `json:"description,omitempty" db:"description"`
 	IdTo        uuid.UUID `json:"id_to,omitempty" db:"user_to"`
 }
 
@@ -220,8 +220,8 @@ func (r *FinanceRepo) GetTransactionsList(id uuid.UUID, sort string, dir string,
 		list[i].Date = toVal[i].Date
 		list[i].Description = toVal[i].Description
 		if toVal[i].IdTo == uuid.Nil {
-			list[i].IdTo= ""
-		}else {
+			list[i].IdTo = ""
+		} else {
 			list[i].IdTo = toVal[i].IdTo.String()
 		}
 

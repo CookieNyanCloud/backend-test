@@ -15,6 +15,6 @@ CREATE TABLE IF NOT EXISTS transactions
     sum         DECIMAL     NOT NULL,
     date        timestamp   NOT NULL DEFAULT (now()),
     description varchar(50)          DEFAULT '',
-    user_to     UUID
+    user_to     UUID REFERENCES userbalance (id) ON DELETE CASCADE
 );
 
