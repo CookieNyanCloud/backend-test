@@ -21,7 +21,7 @@ func (h *Handler) initFinanceRoutes(api *gin.RouterGroup) {
 }
 
 const (
-	Success = "удачная транзакция"
+	success = "удачная транзакция"
 	userFail = "неверные данные"
 )
 
@@ -60,7 +60,7 @@ func (h *Handler) transaction(c *gin.Context) {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, response{Success})
+	c.JSON(http.StatusOK, response{success})
 
 }
 
@@ -77,7 +77,7 @@ func (h *Handler) remittance(c *gin.Context) {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, response{Success})
+	c.JSON(http.StatusOK, response{success})
 
 }
 
