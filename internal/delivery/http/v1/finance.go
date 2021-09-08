@@ -22,6 +22,7 @@ func (h *Handler) initFinanceRoutes(api *gin.RouterGroup) {
 
 const (
 	Success = "удачная транзакция"
+	userFail = "неверные данные"
 )
 
 type transactionInput struct {
@@ -50,7 +51,7 @@ func (h *Handler) transaction(c *gin.Context) {
 	var inp transactionInput
 	//проверка данных для структуры
 	if err := c.BindJSON(&inp); err != nil {
-		newResponse(c, http.StatusBadRequest, "неверные данные")
+		newResponse(c, http.StatusBadRequest, userFail)
 		return
 	}
 
@@ -67,7 +68,7 @@ func (h *Handler) remittance(c *gin.Context) {
 	var inp remittanceInput
 	//проверка данных для структуры
 	if err := c.BindJSON(&inp); err != nil {
-		newResponse(c, http.StatusBadRequest, "неверные данные")
+		newResponse(c, http.StatusBadRequest, userFail)
 		return
 	}
 
@@ -85,7 +86,7 @@ func (h *Handler) balance(c *gin.Context) {
 	var inp balanceInput
 	//проверка данных для структуры
 	if err := c.BindJSON(&inp); err != nil {
-		newResponse(c, http.StatusBadRequest, "неверные данные")
+		newResponse(c, http.StatusBadRequest, userFail)
 		return
 	}
 	//передача данных
@@ -127,7 +128,7 @@ func (h *Handler) transactionsList(c *gin.Context) {
 	var inp transactionsListInput
 	//проверка данных для структуры
 	if err := c.BindJSON(&inp); err != nil {
-		newResponse(c, http.StatusBadRequest, "неверные данные")
+		newResponse(c, http.StatusBadRequest, userFail)
 		return
 	}
 	//передача данных
