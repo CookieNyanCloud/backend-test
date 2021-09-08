@@ -1,10 +1,6 @@
 #локально
 run:
 	go run cmd/main.go -local
-#гит
-push:
-	git push origin master
-
 #докер
 upbuild:
 	docker-compose up --build avito-backend-test
