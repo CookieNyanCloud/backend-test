@@ -1,12 +1,10 @@
 package repository
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
-	"strconv"
 	"time"
 )
 
@@ -33,7 +31,7 @@ type listToValidate struct {
 	Sum         float64       `json:"sum" db:"sum"`
 	Date        time.Time     `json:"date" db:"date"`
 	Description string        `json:"description,omitempty" db:"description"`
-	IdTo        sql.NullInt64 `json:"id_to,omitempty" db:"user_to"`
+	IdTo        uuid.UUID `json:"id_to,omitempty" db:"user_to"`
 }
 
 type Finance interface {
@@ -221,11 +219,17 @@ func (r *FinanceRepo) GetTransactionsList(id uuid.UUID, sort string, dir string,
 		list[i].Sum = toVal[i].Sum
 		list[i].Date = toVal[i].Date
 		list[i].Description = toVal[i].Description
-		if toVal[i].IdTo.Valid {
-			list[i].IdTo = strconv.FormatInt(toVal[i].IdTo.Int64, 10)
-		} else {
-			list[i].IdTo = ""
+		if toVal[i].IdTo == uuid.Nil {
+			list[i].IdTo= ""
+		}else {
+			list[i].IdTo = toVal[i].IdTo.String()
 		}
+
+		//if toVal[i].IdTo.Valid {
+		//	list[i].IdTo = strconv.FormatInt(toVal[i].IdTo.Int64, 10)
+		//} else {
+		//	list[i].IdTo = ""
+		//}
 	}
 
 	return list, nil
