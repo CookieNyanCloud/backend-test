@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS transactions
     operation   varchar(16) NOT NULL,
     sum         DECIMAL     NOT NULL,
     date        timestamp   NOT NULL DEFAULT (now()),
-    description varchar(50)          DEFAULT '',
+    description varchar(20)          DEFAULT '',
     user_to     UUID REFERENCES userbalance (id)
 );
 
