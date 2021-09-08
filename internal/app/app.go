@@ -17,37 +17,29 @@ import (
 	"time"
 )
 
-//todo:tests
-//todo:precision
-
-//todo:swagger?
-//todo:uuid?
-//todo:money types?
-
-
 func Run(configPath string, local bool) {
 
 	//подтягиваем значения переменных из папки конфигураций и .env
 	cfg, err := config.Init(configPath, local)
 	if err != nil {
-		logger.Errorf("ошибка инициализации переменных:%v",err)
+		logger.Errorf("ошибка инициализации переменных:%v", err)
 		return
 	}
 
 	//инициализация базы данных
 	postgresClient, err := postgres.NewClient(cfg.Postgres)
 	if err != nil {
-		logger.Errorf("ошибка инициализации базы данных:%v",err)
+		logger.Errorf("ошибка инициализации базы данных:%v", err)
 		return
 	}
 	repos := repository.NewFinanceRepo(postgresClient)
 
 	//инициализация сервисов
 	financeService := service.NewFinanceService(repos)
-	curService:=service.CurService{ApiKey: cfg.ApiKey}
+	curService := service.CurService{ApiKey: cfg.ApiKey}
 
 	//http
-	handlers := delivery.NewHandler(financeService,curService)
+	handlers := delivery.NewHandler(financeService, curService)
 
 	//сервер
 	srv := server.NewServer(cfg, handlers.Init(cfg))
@@ -66,10 +58,10 @@ func Run(configPath string, local bool) {
 	ctx, shutdown := context.WithTimeout(context.Background(), timeout)
 	defer shutdown()
 	if err := srv.Stop(ctx); err != nil {
-		logger.Errorf("ошибка при остановке сервера: %v",err)
+		logger.Errorf("ошибка при остановке сервера: %v", err)
 	}
 	if err := postgresClient.Close(); err != nil {
-		logger.Errorf("ошибка при закрытии соединения с бд: %v",err.Error())
+		logger.Errorf("ошибка при закрытии соединения с бд: %v", err.Error())
 	}
 
 }

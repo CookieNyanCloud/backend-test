@@ -25,16 +25,16 @@ const (
 )
 
 type transactionInput struct {
-	Id          uuid.UUID     `json:"id" binding:"required"`
-	Sum         float64 `json:"sum" binding:"required"`
-	Description string  `json:"description" binding:"max=20"`
+	Id          uuid.UUID `json:"id" binding:"required"`
+	Sum         float64   `json:"sum" binding:"required"`
+	Description string    `json:"description" binding:"max=20"`
 }
 
 type remittanceInput struct {
-	IdFrom      uuid.UUID     `json:"id_from" binding:"required"`
-	IdTo        uuid.UUID     `json:"id_to" binding:"required"`
-	Sum         float64 `json:"sum" binding:"required,gt=0"`
-	Description string  `json:"description" binding:"max=20"`
+	IdFrom      uuid.UUID `json:"id_from" binding:"required"`
+	IdTo        uuid.UUID `json:"id_to" binding:"required"`
+	Sum         float64   `json:"sum" binding:"required,gt=0"`
+	Description string    `json:"description" binding:"max=20"`
 }
 
 type balanceInput struct {
@@ -139,4 +139,3 @@ func (h *Handler) transactionsList(c *gin.Context) {
 
 	c.JSON(http.StatusOK, list)
 }
-

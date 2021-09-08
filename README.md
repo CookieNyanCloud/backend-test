@@ -7,9 +7,10 @@
 - не совсем механизм миграций, инициализация бд с пустыми таблицами в соответствии с схемой происходит на стороне сервера при инициализации бд
 ### Локально
 - Пароль к базе дынных и ключ к api для выдачи курса валют в .env файле
+- (указал свой ключ в случае необходимости тестить)
 ```dotenv
 POSTGRES_PASSWORD=
-API_KEY=
+API_KEY=218c33ffdc359403488c0e9469e3d94e
 host=db
  ```
 - для локального запуска `make run` (go run cmd/main.go -local флаг позволяет отличить хост и его источник)
@@ -100,36 +101,34 @@ host=db
     {
         "id": "a8887f18-b68e-4999-9c33-cc8ecbdf8c2c",
         "operation": "transaction",
+        "sum": -110,
+        "date": "2021-09-08T17:28:32.033618Z"
+    },
+    {
+        "id": "a8887f18-b68e-4999-9c33-cc8ecbdf8c2c",
+        "operation": "transaction",
         "sum": 10,
-        "date": "2021-09-08T16:58:09.29758Z"
+        "date": "2021-09-08T17:28:25.044972Z"
     },
     {
         "id": "a8887f18-b68e-4999-9c33-cc8ecbdf8c2c",
         "operation": "remittance",
-        "sum": 20,
-        "date": "2021-09-08T17:01:28.779864Z",
+        "sum": 10,
+        "date": "2021-09-08T17:29:03.243682Z",
         "id_to": "bc5f99f1-6808-4631-9eb0-e99f51e69bc8"
     },
     {
         "id": "a8887f18-b68e-4999-9c33-cc8ecbdf8c2c",
-        "operation": "remittance",
-        "sum": 30,
-        "date": "2021-09-08T17:01:32.048405Z",
-        "id_to": "bc5f99f1-6808-4631-9eb0-e99f51e69bc8"
+        "operation": "transaction",
+        "sum": 45,
+        "date": "2021-09-08T17:40:11.272648Z",
+        "description": "test"
     },
     {
         "id": "a8887f18-b68e-4999-9c33-cc8ecbdf8c2c",
-        "operation": "remittance",
-        "sum": 40,
-        "date": "2021-09-08T17:01:35.578744Z",
-        "id_to": "bc5f99f1-6808-4631-9eb0-e99f51e69bc8"
-    },
-    {
-        "id": "bc5f99f1-6808-4631-9eb0-e99f51e69bc8",
-        "operation": "remittance",
-        "sum": 40,
-        "date": "2021-09-08T17:14:56.308877Z",
-        "id_to": "a8887f18-b68e-4999-9c33-cc8ecbdf8c2c"
+        "operation": "transaction",
+        "sum": 110,
+        "date": "2021-09-08T17:28:28.052397Z"
     }
 ]
 ```
