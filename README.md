@@ -133,7 +133,7 @@ host=db
 ```
 
 ## схема
-![Schema](https://i.ibb.co/MNg3FG1/avito.png)
+![Schema]([https://i.ibb.co/WKy1r5w/avito.png)
 
 
 
