@@ -6,10 +6,10 @@ import (
 )
 
 type FinanceService struct {
-	repo repository.Finance
+	repo repository.FinanceOperations
 }
 
-func NewFinanceService(repo repository.Finance) *FinanceService {
+func NewFinanceService(repo repository.FinanceOperations) *FinanceService {
 	return &FinanceService{repo}
 }
 

@@ -54,7 +54,7 @@ func (h *Handler) transaction(c *gin.Context) {
 	}
 
 	if err := h.services.MakeTransaction(inp.Id, inp.Sum, inp.Description); err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
+		newResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, response{success})
