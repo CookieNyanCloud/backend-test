@@ -7,7 +7,6 @@ import (
 	"time"
 )
 
-//типы сообщений
 type response struct {
 	Message string `json:"message"`
 }

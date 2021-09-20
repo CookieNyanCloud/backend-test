@@ -2,7 +2,6 @@ package logger
 
 import "github.com/sirupsen/logrus"
 
-//форматирование логов
 func Info(msg ...interface{}) {
 	logrus.Info(msg...)
 }

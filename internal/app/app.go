@@ -17,40 +17,50 @@ import (
 	"time"
 )
 
+const (
+	initEnvErr           = "error initializing env: %v\n"
+	initDbErr            = "error initializing database: %v\n"
+	serverErr            = "error during http server work: %s\n"
+	stopServerErr        = "error trying to stop server: %v\n"
+	closeDbConnectionErr = "error closing database connection: %v\n"
+
+	start = "start"
+)
+
 func Run(configPath string, local bool) {
 
-	//подтягиваем значения переменных из папки конфигураций и .env
+	//get env vars from .env
 	cfg, err := config.Init(configPath, local)
 	if err != nil {
-		logger.Errorf("ошибка инициализации переменных:%v", err)
+		logger.Errorf(initEnvErr, err)
 		return
 	}
 
-	//инициализация базы данных
+	//init db
 	postgresClient, err := postgres.NewClient(cfg.Postgres)
 	if err != nil {
-		logger.Errorf("ошибка инициализации базы данных:%v", err)
+		logger.Errorf(initDbErr, err)
 		return
 	}
 	repos := repository.NewFinanceRepo(postgresClient)
 
-	//инициализация сервисов
+	//init services
 	financeService := service.NewFinanceService(repos)
 	curService := service.CurService{ApiKey: cfg.ApiKey}
 
 	//http
 	handlers := delivery.NewHandler(financeService, curService)
 
-	//сервер
+	//server
 	srv := server.NewServer(cfg, handlers.Init(cfg))
 	go func() {
 		if err := srv.Run(); !errors.Is(err, http.ErrServerClosed) {
-			logger.Errorf("возникла ошибка в работе http сервера: %s\n", err.Error())
+			logger.Errorf(serverErr, err.Error())
 		}
 	}()
-	logger.Info("запуск")
+	logger.Info(start)
 
-	//выход
+	//quit
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
 	<-quit
@@ -58,10 +68,10 @@ func Run(configPath string, local bool) {
 	ctx, shutdown := context.WithTimeout(context.Background(), timeout)
 	defer shutdown()
 	if err := srv.Stop(ctx); err != nil {
-		logger.Errorf("ошибка при остановке сервера: %v", err)
+		logger.Errorf(stopServerErr, err)
 	}
 	if err := postgresClient.Close(); err != nil {
-		logger.Errorf("ошибка при закрытии соединения с бд: %v", err.Error())
+		logger.Errorf(closeDbConnectionErr, err.Error())
 	}
 
 }

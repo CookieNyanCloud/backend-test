@@ -5,7 +5,7 @@ services:
     image: avito-backend-test
     container_name: avito-backend-test
     build: ./
-    command: ./wait-for-postgres.sh db ./avito-backend-test
+    command: ./wait-for-postgres.sh db ./avito-backend-testdock
     ports:
       - 8090:8090
     depends_on:

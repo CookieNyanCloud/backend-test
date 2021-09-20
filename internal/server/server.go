@@ -6,7 +6,6 @@ import (
 	"net/http"
 )
 
-//создание сервера
 type Server struct {
 	httpServer *http.Server
 }

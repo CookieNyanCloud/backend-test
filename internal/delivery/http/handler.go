@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//хэндлер с двумя сервисами, работы с финансами и работы с курсом
+//services handler
 type Handler struct {
 	service    *service.FinanceService
 	curService service.CurService

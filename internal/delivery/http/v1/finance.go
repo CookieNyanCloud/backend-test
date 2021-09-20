@@ -9,7 +9,6 @@ import (
 )
 
 func (h *Handler) initFinanceRoutes(api *gin.RouterGroup) {
-	//пути к операциям
 	operation := api.Group("/operation")
 	{
 		operation.POST("/transaction", h.transaction)
@@ -21,7 +20,7 @@ func (h *Handler) initFinanceRoutes(api *gin.RouterGroup) {
 }
 
 const (
-	success = "удачная транзакция"
+	success  = "удачная транзакция"
 	userFail = "неверные данные"
 )
 
@@ -49,14 +48,12 @@ type transactionsListInput struct {
 func (h *Handler) transaction(c *gin.Context) {
 
 	var inp transactionInput
-	//проверка данных для структуры
 	if err := c.BindJSON(&inp); err != nil {
 		newResponse(c, http.StatusBadRequest, userFail)
 		return
 	}
 
-	//передача данных
-	if err := h.services.Transaction(inp.Id, inp.Sum, inp.Description); err != nil {
+	if err := h.services.MakeTransaction(inp.Id, inp.Sum, inp.Description); err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -66,15 +63,13 @@ func (h *Handler) transaction(c *gin.Context) {
 
 func (h *Handler) remittance(c *gin.Context) {
 	var inp remittanceInput
-	//проверка данных для структуры
 	if err := c.BindJSON(&inp); err != nil {
 		newResponse(c, http.StatusBadRequest, userFail)
 		return
 	}
 
-	//передача данных
-	if err := h.services.Remittance(inp.IdFrom, inp.IdTo, inp.Sum, inp.Description); err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
+	if err := h.services.MakeRemittance(inp.IdFrom, inp.IdTo, inp.Sum, inp.Description); err != nil {
+		newResponse(c, http.StatusNotFound, err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, response{success})
@@ -84,15 +79,13 @@ func (h *Handler) remittance(c *gin.Context) {
 func (h *Handler) balance(c *gin.Context) {
 	cur := c.DefaultQuery("currency", "RUB")
 	var inp balanceInput
-	//проверка данных для структуры
 	if err := c.BindJSON(&inp); err != nil {
 		newResponse(c, http.StatusBadRequest, userFail)
 		return
 	}
-	//передача данных
-	balance, err := h.services.Balance(inp.Id)
+	balance, err := h.services.GetBalance(inp.Id)
 	if err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
+		newResponse(c, http.StatusNotFound, err.Error())
 		return
 	}
 	if cur == "RUB" {
@@ -126,12 +119,10 @@ func (h *Handler) transactionsList(c *gin.Context) {
 	}
 
 	var inp transactionsListInput
-	//проверка данных для структуры
 	if err := c.BindJSON(&inp); err != nil {
 		newResponse(c, http.StatusBadRequest, userFail)
 		return
 	}
-	//передача данных
 	list, err := h.services.GetTransactionsList(inp.Id, sort, dir, page)
 	if err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())

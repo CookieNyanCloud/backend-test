@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 )
 
-//создание клиента бд
 func NewClient(cfg config.PostgresConfig) (*sqlx.DB, error) {
 	db, err := sqlx.Open("postgres",
 		fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
@@ -26,14 +25,13 @@ func NewClient(cfg config.PostgresConfig) (*sqlx.DB, error) {
 		return nil, err
 	}
 
-	//выполнение схемы
-	path:=filepath.Join("schema","000001_init_schema.up.sql")
+	path := filepath.Join("schema", "000001_init_schema.up.sql")
 	c, ioErr := ioutil.ReadFile(path)
 	if ioErr != nil {
 		return nil, err
 	}
-	sql:= string(c)
-	sqlx.MustExec(db,sql)
+	sql := string(c)
+	sqlx.MustExec(db, sql)
 
 	return db, nil
 }

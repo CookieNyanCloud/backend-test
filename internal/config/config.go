@@ -5,7 +5,6 @@ import (
 	"time"
 )
 
-//конфигурации
 type (
 	Config struct {
 		Postgres PostgresConfig
@@ -39,27 +38,25 @@ type (
 
 func Init(configDir string, local bool) (*Config, error) {
 
-	//чтение данных из файла конфигураций
+	//reading yaml config file
 	viper.AddConfigPath(configDir)
 	viper.SetConfigName("main")
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, err
 	}
 
+	//creating config struct
 	var cfg Config
-	//заполняем структуру значениями из файла конфигураций
 	if err := unmarshal(&cfg); err != nil {
 		return nil, err
 	}
 
-	// чтение .env файла
+	//reading .env config file
 	viper.AddConfigPath(".")
 	viper.SetConfigFile(".env")
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, err
 	}
-
-	//заполняем структуру значениями из .env
 	cfg.Postgres.Password = viper.GetString("postgres_password")
 	cfg.ApiKey = viper.GetString("api_key")
 	if !local {
