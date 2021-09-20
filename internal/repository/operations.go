@@ -15,10 +15,11 @@ type FinanceOperations interface {
 
 func (r *FinanceRepo) MakeTransaction(id uuid.UUID, sum float64, description string) error {
 	var noUserError = errors.New(noUser)
-	currentBalance, err := r.GetBalance(id)
+	//due to new logic, just checks existence
+	_, err := r.GetBalance(id)
 	if err != nil {
 		//check err type
-		if err== noUserError && sum > 0 {
+		if err == noUserError && sum > 0 {
 			//no user
 			err = r.CreateNewUser(id, sum)
 			if err != nil {
@@ -33,26 +34,28 @@ func (r *FinanceRepo) MakeTransaction(id uuid.UUID, sum float64, description str
 		//other err
 		return err
 	}
-	newBalance := currentBalance + sum
-	if newBalance >= 0 {
-		query := fmt.Sprintf("UPDATE %s SET balance = $1  WHERE id = $2", financeTable)
-		_, err = r.db.Exec(query, newBalance, id)
-		if err != nil {
-			return err
-		}
-		err = r.CreateNewTransaction(id, transaction, sum, uuid.Nil, description)
-		if err != nil {
-			return err
-		}
-		return nil
+	//Avoiding the read-modify-write cycle
+	//newBalance := currentBalance + sum
+	//if newBalance >= 0 {
+	query := fmt.Sprintf("UPDATE %s SET balance = balance + $1  WHERE id = $2", financeTable)
+	_, err = r.db.Exec(query, sum, id)
+	if err != nil {
+		//return err
+		return errors.New(Minus)
 	}
-	return errors.New(Minus)
+	err = r.CreateNewTransaction(id, transaction, sum, uuid.Nil, description)
+	if err != nil {
+		return err
+	}
+	return nil
+	//}
+	//return errors.New(Minus)
 }
 
 func (r *FinanceRepo) MakeRemittance(idFrom uuid.UUID, idTo uuid.UUID, sum float64, description string) error {
-	//check
+	//due to new logic, just checks existence
 	var noUserError = errors.New(noUser)
-	currentBalanceFrom, err := r.GetBalance(idFrom)
+	_, err := r.GetBalance(idFrom)
 	if err != nil {
 		if err == noUserError {
 			return errors.New(noSense)
@@ -61,43 +64,44 @@ func (r *FinanceRepo) MakeRemittance(idFrom uuid.UUID, idTo uuid.UUID, sum float
 		return err
 	}
 	//check
-	currentBalanceTo, err := r.GetBalance(idTo)
+	_, err = r.GetBalance(idTo)
 	if err != nil && err != noUserError {
 		//other
 		return err
 	}
 	if err != nil && err != noUserError {
 		err = r.CreateNewUser(idTo, 0)
-		currentBalanceTo = 0
+		//currentBalanceTo = 0
 		if err != nil {
 			return err
 		}
 	}
-	newBalanceFrom := currentBalanceFrom - sum
-	newBalanceTo := currentBalanceTo + sum
-	if newBalanceFrom >= 0 {
-		query := fmt.Sprintf("UPDATE %s SET balance = $1  WHERE id = $2",
-			financeTable)
-		_, err = r.db.Exec(query, newBalanceFrom, idFrom)
-		if err != nil {
-			return err
-		}
-
-		query = fmt.Sprintf("UPDATE %s SET balance = $1  WHERE id = $2",
-			financeTable)
-		_, err = r.db.Exec(query, newBalanceTo, idTo)
-		if err != nil {
-			return err
-		}
-
-		err = r.CreateNewTransaction(idFrom, remittance, sum, idTo, description)
-		if err != nil {
-			return err
-		}
-
-		return nil
+	//Avoiding the read-modify-write cycle
+	//newBalanceFrom := currentBalanceFrom - sum
+	//newBalanceTo := currentBalanceTo + sum
+	//if newBalanceFrom >= 0 {
+	query := fmt.Sprintf("UPDATE %s SET balance = balance - $1  WHERE id = $2",
+		financeTable)
+	_, err = r.db.Exec(query, sum, idFrom)
+	if err != nil {
+		return errors.New(Minus)
 	}
-	return errors.New(Minus)
+
+	query = fmt.Sprintf("UPDATE %s SET balance = balance + $1  WHERE id = $2",
+		financeTable)
+	_, err = r.db.Exec(query, sum, idTo)
+	if err != nil {
+		return err
+	}
+
+	err = r.CreateNewTransaction(idFrom, remittance, sum, idTo, description)
+	if err != nil {
+		return err
+	}
+
+	return nil
+	//}
+	//return errors.New(Minus)
 }
 
 func (r *FinanceRepo) GetBalance(id uuid.UUID) (float64, error) {
