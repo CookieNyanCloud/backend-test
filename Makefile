@@ -2,16 +2,16 @@ run:
 	go run cmd/main.go -local
 
 upbuild:
-	docker-compose up --build avito-backend-test
+	docker-compose up --build backend-test
 up:
-	docker-compose up avito-backend-test
+	docker-compose up backend-test
 build:
-	docker build -t avito-backend-test .
+	docker build -t backend-test .
 prune:
 	docker container prune
 dockerrun:
-	docker run --name=avito-backend-test -p 8090:8090 --rm avito-backend-test
+	docker run --name=backend-test -p 8090:8090 --rm backend-test
 down:
-	docker-compose down avito-backend-test
+	docker-compose down backend-test
 
 .PHONY: run push prune build dockerrun upbuild up down
