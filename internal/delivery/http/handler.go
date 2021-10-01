@@ -30,6 +30,7 @@ func (h *Handler) Init(cfg *config.Config) *gin.Engine {
 }
 
 func (h *Handler) initAPI(router *gin.Engine) {
+
 	handlerV1 := v1.NewHandler(h.service, h.curService)
 	api := router.Group("/api")
 	{
