@@ -1,3 +1,5 @@
+[![GoReportCard](https://goreportcard.com/badge/github.com/cookienyancloud/backend-test)](https://goreportcard.com/report/github.com/cookienyancloud/backend-test)
+
 # Тестовое задание
 
 ## Запуск
@@ -139,10 +141,3 @@ host=db
 ## Для связи
 - [telegram - t.me/cookienyancloud](t.me/cookienyancloud)
 - [почта - emil8yunusov@gmail.com](emil8yunusov@gmail.com)
-
-
-
-
- 
- 
- 

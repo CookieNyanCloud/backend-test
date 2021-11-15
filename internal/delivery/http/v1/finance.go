@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func (h *Handler) initFinanceRoutes(api *gin.RouterGroup) {
+func (h *Handler) rinitFinanceRoutes(api *gin.RouterGroup) {
 	operation := api.Group("/operation")
 	{
 		operation.POST("/transaction", h.transaction)
