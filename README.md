@@ -24,12 +24,13 @@ host=db
 - decimal и float64 в бд и структурах соответственно
 # начисление средств
 - POST `http://localhost:8090/api/v1/operation/transaction`
-- на входе обязательные id (uuid),сумма (десятичная дробь), вариативно описание(до 20 символов)
+- на входе обязательные id, IdempotencyKey (uuid),сумма (десятичная дробь), вариативно описание(до 20 символов)
 ```json
 {
     "id":"a8887f18-b68e-4999-9c33-cc8ecbdf8c2c",
-    "sum":100.5,
-    "description":"tests"
+    "sum":"100.5",
+    "description":"tests",
+    "IdempotencyKey": "a8887f58-b68e-4999-9c33-cc8ecbdf8c2c"
 }
 ```
 - так как в базе данных не должно быть данных изначально, при отсутствии id запись создается
@@ -47,7 +48,7 @@ host=db
 {
     "id_from":"a8887f18-b68e-4999-9c33-cc8ecbdf8c2c",
     "id_to":"bc5f99f1-6808-4631-9eb0-e99f51e69bc8",
-    "sum":200000,
+    "sum":"200000",
     "description":"tests"
 }
 ```
@@ -101,33 +102,33 @@ host=db
     {
         "id": "a8887f18-b68e-4999-9c33-cc8ecbdf8c2c",
         "operation": "transaction",
-        "sum": -110,
+        "sum": "-110",
         "date": "2021-09-08T17:28:32.033618Z"
     },
     {
         "id": "a8887f18-b68e-4999-9c33-cc8ecbdf8c2c",
         "operation": "transaction",
-        "sum": 10,
+        "sum": "10",
         "date": "2021-09-08T17:28:25.044972Z"
     },
     {
         "id": "a8887f18-b68e-4999-9c33-cc8ecbdf8c2c",
         "operation": "remittance",
-        "sum": 10,
+        "sum": "10",
         "date": "2021-09-08T17:29:03.243682Z",
         "id_to": "bc5f99f1-6808-4631-9eb0-e99f51e69bc8"
     },
     {
         "id": "a8887f18-b68e-4999-9c33-cc8ecbdf8c2c",
         "operation": "transaction",
-        "sum": 45,
+        "sum": "45",
         "date": "2021-09-08T17:40:11.272648Z",
         "description": "test"
     },
     {
         "id": "a8887f18-b68e-4999-9c33-cc8ecbdf8c2c",
         "operation": "transaction",
-        "sum": 110,
+        "sum": "110",
         "date": "2021-09-08T17:28:28.052397Z"
     }
 ]

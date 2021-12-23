@@ -13,13 +13,16 @@ type CurService struct {
 	ApiKey string
 }
 
+func NewCurService(apiKey string) ICurrency {
+	return &CurService{ApiKey: apiKey}
+}
+
 type CurrencyResponse struct {
-	Success   bool   `json:"success"`
-	Timestamp int64  `json:"timestamp"`
-	Base      string `json:"base"`
-	Date      string `json:"date"`
-	//filling unknown fields
-	Rates map[string]interface{} `json:"rates"`
+	Success   bool                   `json:"success"`
+	Timestamp int64                  `json:"timestamp"`
+	Base      string                 `json:"base"`
+	Date      string                 `json:"date"`
+	Rates     map[string]interface{} `json:"rates"`
 }
 
 var (
@@ -32,7 +35,7 @@ var (
 	}
 )
 
-type Currency interface {
+type ICurrency interface {
 	GetCur(cur string, sum float64) (string, error)
 }
 

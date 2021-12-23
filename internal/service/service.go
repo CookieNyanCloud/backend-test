@@ -1,37 +1,39 @@
 package service
 
 import (
+	"context"
+
+	"github.com/cookienyancloud/avito-backend-test/internal/domain"
 	"github.com/cookienyancloud/avito-backend-test/internal/repository"
-	"github.com/google/uuid"
 )
 
 type FinanceService struct {
 	repo repository.FinanceOperations
 }
 
-func NewFinanceService(repo repository.FinanceOperations) *FinanceService {
+func NewFinanceService(repo repository.FinanceOperations) IFinance {
 	return &FinanceService{repo}
 }
 
-type Finance interface {
-	MakeTransaction(id uuid.UUID, sum float64, description string) error
-	MakeRemittance(idFrom uuid.UUID, idTo uuid.UUID, sum string, description string) error
-	GetBalance(id int) (float64, error)
-	GetTransactionsList(id uuid.UUID, sort string, dir string, page int) ([]repository.TransactionsList, error)
+type IFinance interface {
+	MakeTransaction(ctx context.Context, inp *domain.TransactionInput) error
+	MakeRemittance(ctx context.Context, inp *domain.RemittanceInput) error
+	GetBalance(ctx context.Context, inp *domain.BalanceInput) (float64, error)
+	GetTransactionsList(ctx context.Context, inp *domain.TransactionsListInput) ([]repository.TransactionsList, error)
 }
 
-func (s *FinanceService) MakeTransaction(id uuid.UUID, sum float64, description string) error {
-	return s.repo.MakeTransaction(id, sum, description)
+func (s *FinanceService) MakeTransaction(ctx context.Context, inp *domain.TransactionInput) error {
+	return s.repo.MakeTransaction(ctx, inp)
 }
 
-func (s *FinanceService) MakeRemittance(idFrom uuid.UUID, idTo uuid.UUID, sum float64, description string) error {
-	return s.repo.MakeRemittance(idFrom, idTo, sum, description)
+func (s *FinanceService) MakeRemittance(ctx context.Context, inp *domain.RemittanceInput) error {
+	return s.repo.MakeRemittance(ctx, inp)
 }
 
-func (s *FinanceService) GetBalance(id uuid.UUID) (float64, error) {
-	return s.repo.GetBalance(id)
+func (s *FinanceService) GetBalance(ctx context.Context, inp *domain.BalanceInput) (float64, error) {
+	return s.repo.GetBalance(ctx, inp)
 }
 
-func (s *FinanceService) GetTransactionsList(id uuid.UUID, sort string, dir string, page int) ([]repository.TransactionsList, error) {
-	return s.repo.GetTransactionsList(id, sort, dir, page)
+func (s *FinanceService) GetTransactionsList(ctx context.Context, inp *domain.TransactionsListInput) ([]repository.TransactionsList, error) {
+	return s.repo.GetTransactionsList(ctx, inp)
 }

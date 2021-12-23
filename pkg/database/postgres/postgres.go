@@ -2,10 +2,11 @@ package postgres
 
 import (
 	"fmt"
-	"github.com/cookienyancloud/avito-backend-test/internal/config"
-	"github.com/jmoiron/sqlx"
 	"io/ioutil"
 	"path/filepath"
+
+	"github.com/cookienyancloud/avito-backend-test/internal/config"
+	"github.com/jmoiron/sqlx"
 )
 
 func NewClient(cfg config.PostgresConfig) (*sqlx.DB, error) {

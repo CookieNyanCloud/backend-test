@@ -1,14 +1,16 @@
 package config
 
 import (
-	"github.com/spf13/viper"
 	"time"
+
+	"github.com/spf13/viper"
 )
 
 type (
 	Config struct {
 		Postgres PostgresConfig
 		HTTP     HTTPConfig
+		Redis    RedisConfig
 		ApiKey   string
 	}
 
@@ -27,6 +29,9 @@ type (
 		ReadTimeout        time.Duration
 		WriteTimeout       time.Duration
 		MaxHeaderMegabytes int
+	}
+	RedisConfig struct {
+		Addr string
 	}
 
 	LimiterConfig struct {
@@ -70,6 +75,9 @@ func unmarshal(cfg *Config) error {
 		return err
 	}
 	if err := viper.UnmarshalKey("http", &cfg.HTTP); err != nil {
+		return err
+	}
+	if err := viper.UnmarshalKey("redis", &cfg.Redis); err != nil {
 		return err
 	}
 	return nil
