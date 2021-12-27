@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/cookienyancloud/avito-backend-test/internal/app"
+	//_ "github.com/jackc/pgx/stdlib"
 	_ "github.com/lib/pq"
 )
 

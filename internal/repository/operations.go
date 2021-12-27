@@ -2,12 +2,13 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/cookienyancloud/avito-backend-test/internal/domain"
 	"github.com/google/uuid"
 )
+
+//go:generate mockgen -source=operations.go -destination=mocks/operations/mock.go
 
 type FinanceOperations interface {
 	MakeTransaction(ctx context.Context, inp *domain.TransactionInput) error
@@ -17,43 +18,33 @@ type FinanceOperations interface {
 }
 
 func (r *FinanceRepo) MakeTransaction(ctx context.Context, inp *domain.TransactionInput) error {
-
-	tx, err := r.db.BeginTx(ctx, nil)
-	if err != nil {
-		return err
+	println("MakeTransaction")
+	balance := &domain.BalanceInput{
+		Id: inp.Id,
 	}
-	defer tx.Rollback()
-
-	_, err = r.GetBalance(ctx, &domain.BalanceInput{Id: inp.Id})
-
+	_, err := r.GetBalance(ctx, balance)
 	if err != nil {
-		//check err type
-		if errors.Is(err, NoBalance) {
-			//no user
-			err = r.CreateNewUser(ctx, inp.Id, inp.Sum)
-			if err != nil {
-				return err
-			}
-			//make task
-			err = r.CreateNewTransaction(ctx, inp.Id, transaction, inp.Sum, uuid.Nil, inp.Description, inp.IdempotencyKey)
-			if err != nil {
-				return err
-			}
+		//no user
+		err = r.CreateNewUser(ctx, inp.Id, inp.Sum)
+		if err != nil {
+			return err
 		}
-		return NoBalance
+		//make task
+		err = r.CreateNewTransaction(ctx, inp.Id, transaction, inp.Sum, uuid.Nil, inp.Description, inp.IdempotencyKey)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
 	query := fmt.Sprintf("UPDATE %s SET balance = balance + $1  WHERE id = $2", financeTable)
 	_, err = r.db.Exec(query, inp.Sum, inp.Id)
 	if err != nil {
+		//return err
 		return NoBalance
 	}
 	err = r.CreateNewTransaction(ctx, inp.Id, transaction, inp.Sum, uuid.Nil, inp.Description, inp.IdempotencyKey)
 	if err != nil {
-		return err
-	}
-
-	if err = tx.Commit(); err != nil {
 		return err
 	}
 	return nil
@@ -103,6 +94,8 @@ func (r *FinanceRepo) MakeRemittance(ctx context.Context, inp *domain.Remittance
 }
 
 func (r *FinanceRepo) GetBalance(ctx context.Context, inp *domain.BalanceInput) (float64, error) {
+	println("GetBalance")
+
 	var currentBalance float64
 	query := fmt.Sprintf(`SELECT balance FROM %s WHERE id=$1`, financeTable)
 	err := r.db.Get(&currentBalance, query, inp.Id)

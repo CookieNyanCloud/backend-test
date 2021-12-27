@@ -28,9 +28,9 @@ host=db
 ```json
 {
     "id":"a8887f18-b68e-4999-9c33-cc8ecbdf8c2c",
-    "sum":"100.5",
+    "sum":100.5,
     "description":"tests",
-    "IdempotencyKey": "a8887f58-b68e-4999-9c33-cc8ecbdf8c2c"
+    "idempotency_key": "a8887f58-b68e-4999-9c33-cc8ecbdf8c2c"
 }
 ```
 - так как в базе данных не должно быть данных изначально, при отсутствии id запись создается

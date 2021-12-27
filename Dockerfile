@@ -7,10 +7,11 @@ COPY ./ ./
 
 RUN apt-get update
 RUN apt-get -y install postgresql-client
-
+#
 RUN chmod +x wait-for-postgres.sh
 
+RUN go mod tidy
 RUN go mod download
-RUN go build -o avito-backend-test ./cmd/main.go
+RUN go build -o backend-test ./cmd/main.go
 
-CMD ["./avito-backend-test"]
+CMD ["./backend-test"]

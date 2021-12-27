@@ -8,6 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+
 type FinanceRepo struct {
 	db *sqlx.DB
 }

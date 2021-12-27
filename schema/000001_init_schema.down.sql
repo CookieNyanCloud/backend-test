@@ -1,2 +1,3 @@
+DROP EXTENSION IF EXISTS "uuid-ossp";
 DROP TABLE IF EXISTS transactions;
 DROP TABLE IF EXISTS userbalance;

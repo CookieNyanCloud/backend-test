@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/cookienyancloud/avito-backend-test/pkg/cache"
@@ -25,6 +26,7 @@ type ICache interface {
 }
 
 func (c Cache) CacheKey(ctx context.Context, key uuid.UUID) error {
+	fmt.Println("CacheKey", key)
 	err := c.rd.Client.Set(ctx, key.String(), true, time.Minute).Err()
 	if err != nil {
 		return err
@@ -33,10 +35,13 @@ func (c Cache) CacheKey(ctx context.Context, key uuid.UUID) error {
 }
 
 func (c Cache) CheckKey(ctx context.Context, key uuid.UUID) (bool, error) {
+	fmt.Println("CheckKey", key.String())
 	var state bool
 	err := c.rd.Client.Get(ctx, key.String()).Scan(&state)
-	if err != redis.Nil {
+	if err != redis.Nil && err != nil {
+		fmt.Println("err")
 		return false, err
 	}
+	fmt.Println("state", state)
 	return state, nil
 }
