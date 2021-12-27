@@ -7,13 +7,14 @@ import (
 )
 
 type (
+	//configuration struct
 	Config struct {
 		Postgres PostgresConfig
 		HTTP     HTTPConfig
 		Redis    RedisConfig
 		ApiKey   string
 	}
-
+	//postgres vars
 	PostgresConfig struct {
 		Host     string
 		Port     string
@@ -22,7 +23,7 @@ type (
 		SSLMode  string
 		Password string
 	}
-
+	//http server vars
 	HTTPConfig struct {
 		Host               string
 		Port               string
@@ -30,17 +31,13 @@ type (
 		WriteTimeout       time.Duration
 		MaxHeaderMegabytes int
 	}
+	//redis cache vars
 	RedisConfig struct {
 		Addr string
 	}
-
-	LimiterConfig struct {
-		RPS   int
-		Burst int
-		TTL   time.Duration
-	}
 )
 
+//get variables from yaml and env files
 func Init(configDir string, local bool) (*Config, error) {
 
 	//reading yaml config file

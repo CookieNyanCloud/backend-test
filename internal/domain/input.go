@@ -2,6 +2,7 @@ package domain
 
 import "github.com/google/uuid"
 
+//user input for transaction
 type TransactionInput struct {
 	Id             uuid.UUID `json:"id" binding:"required"`
 	Sum            float64   `json:"sum" binding:"required"`
@@ -9,6 +10,7 @@ type TransactionInput struct {
 	IdempotencyKey uuid.UUID `json:"idempotency_key" binding:"required"`
 }
 
+//user input for remittance
 type RemittanceInput struct {
 	IdFrom         uuid.UUID `json:"id_from" binding:"required"`
 	IdTo           uuid.UUID `json:"id_to" binding:"required"`
@@ -17,10 +19,12 @@ type RemittanceInput struct {
 	IdempotencyKey uuid.UUID `json:"idempotency_key" binding:"required"`
 }
 
+//user input for balance
 type BalanceInput struct {
 	Id uuid.UUID `json:"id" binding:"required"`
 }
 
+//user input for list of transactions
 type TransactionsListInput struct {
 	Id   uuid.UUID `json:"id" binding:"required"`
 	Sort string

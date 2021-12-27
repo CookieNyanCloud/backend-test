@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (h *Handler) initFinanceRoutes(api *gin.RouterGroup) {
+func (h *handler) initFinanceRoutes(api *gin.RouterGroup) {
 	operation := api.Group("/operation")
 	{
 		operation.POST("/transaction", h.Transaction)
@@ -28,7 +28,8 @@ const (
 	duplicate = "повторный запрос"
 )
 
-func (h *Handler) Transaction(c *gin.Context) {
+//handle user transactions request
+func (h *handler) Transaction(c *gin.Context) {
 
 	var inp domain.TransactionInput
 	if err := c.BindJSON(&inp); err != nil {
@@ -38,7 +39,7 @@ func (h *Handler) Transaction(c *gin.Context) {
 	if is := h.CheckCache(c, inp.IdempotencyKey); is {
 		return
 	}
-	if err := h.Services.MakeTransaction(c, &inp); err != nil {
+	if err := h.services.MakeTransaction(c, &inp); err != nil {
 		h.newResponse(c, http.StatusBadRequest, userFail, err)
 		return
 	}
@@ -46,7 +47,8 @@ func (h *Handler) Transaction(c *gin.Context) {
 
 }
 
-func (h *Handler) Remittance(c *gin.Context) {
+//handle transactions request from user to user
+func (h *handler) Remittance(c *gin.Context) {
 	var inp domain.RemittanceInput
 	if err := c.BindJSON(&inp); err != nil {
 		h.newResponse(c, http.StatusBadRequest, userFail, err)
@@ -56,7 +58,7 @@ func (h *Handler) Remittance(c *gin.Context) {
 	if is := h.CheckCache(c, inp.IdempotencyKey); is {
 		return
 	}
-	if err := h.Services.MakeRemittance(c, &inp); err != nil {
+	if err := h.services.MakeRemittance(c, &inp); err != nil {
 		h.newResponse(c, http.StatusBadRequest, userFail, err)
 		return
 	}
@@ -64,7 +66,8 @@ func (h *Handler) Remittance(c *gin.Context) {
 
 }
 
-func (h *Handler) Balance(c *gin.Context) {
+//handle check balance
+func (h *handler) Balance(c *gin.Context) {
 	cur := c.DefaultQuery("currency", "RUB")
 	var inp domain.BalanceInput
 	if err := c.BindJSON(&inp); err != nil {
@@ -72,7 +75,7 @@ func (h *Handler) Balance(c *gin.Context) {
 		return
 	}
 
-	balance, err := h.Services.GetBalance(c, &inp)
+	balance, err := h.services.GetBalance(c, &inp)
 	if err != nil {
 		h.newResponse(c, http.StatusNotFound, userFail, err)
 		return
@@ -85,7 +88,7 @@ func (h *Handler) Balance(c *gin.Context) {
 		return
 	}
 
-	balanceInCur, err := h.CurService.GetCur(cur, balance)
+	balanceInCur, err := h.curService.GetCur(cur, balance)
 	if err != nil {
 		h.newResponse(c, http.StatusBadRequest, userFail, err)
 		return
@@ -97,7 +100,8 @@ func (h *Handler) Balance(c *gin.Context) {
 	})
 }
 
-func (h *Handler) TransactionsList(c *gin.Context) {
+//handle check all transactions by query
+func (h *handler) TransactionsList(c *gin.Context) {
 
 	var inp domain.TransactionsListInput
 	if err := c.BindJSON(&inp); err != nil {
@@ -113,7 +117,7 @@ func (h *Handler) TransactionsList(c *gin.Context) {
 		return
 	}
 	inp.Page = page
-	list, err := h.Services.GetTransactionsList(c, &inp)
+	list, err := h.services.GetTransactionsList(c, &inp)
 	if err != nil {
 		h.newResponse(c, http.StatusBadRequest, userFail, err)
 		return
@@ -122,7 +126,8 @@ func (h *Handler) TransactionsList(c *gin.Context) {
 	c.JSON(http.StatusOK, list)
 }
 
-func (h *Handler) CheckCache(c *gin.Context, key uuid.UUID) bool {
+//check request in cache by key
+func (h *handler) CheckCache(c *gin.Context, key uuid.UUID) bool {
 	state, err := h.cache.CheckKey(c, key)
 	if err != nil {
 		h.newResponse(c, http.StatusInternalServerError, cacheFail, err)

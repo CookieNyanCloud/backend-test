@@ -8,6 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+//struct for communication with database
 type FinanceRepo struct {
 	db *sqlx.DB
 }
@@ -17,10 +18,12 @@ type IFinanceRepo interface {
 	FinanceSubFunctions
 }
 
+//new struct
 func NewFinanceRepo(db *sqlx.DB) IFinanceRepo {
 	return &FinanceRepo{db: db}
 }
 
+//struct for  transactions list request
 type TransactionsList struct {
 	Id             uuid.UUID `json:"id" db:"user_id"`
 	Operation      string    `json:"operation"db:"operation"`
@@ -42,6 +45,6 @@ const (
 )
 
 var (
-	NoBalance        = errors.New("недостаточно средств")
-	UnknownOperation = errors.New("неизвестная операция")
+	noBalance        = errors.New("недостаточно средств")
+	unknownOperation = errors.New("неизвестная операция")
 )

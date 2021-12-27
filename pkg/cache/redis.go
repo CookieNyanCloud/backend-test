@@ -6,18 +6,19 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-type RedisClient struct {
+type redisClient struct {
 	Client *redis.Client
 }
 
-func NewRedisClient(addr string, ctx context.Context) (*RedisClient, error) {
+//new redis cache client
+func NewRedisClient(ctx context.Context, addr string) (*redisClient, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr: addr,
 	})
 	if err := client.Ping(ctx).Err(); err != nil {
 		return nil, err
 	}
-	return &RedisClient{
+	return &redisClient{
 		Client: client,
 	}, nil
 }

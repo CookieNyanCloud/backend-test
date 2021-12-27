@@ -7,12 +7,13 @@ import (
 	"github.com/cookienyancloud/avito-backend-test/internal/config"
 )
 
-type Server struct {
+type server struct {
 	httpServer *http.Server
 }
 
-func NewServer(cfg *config.Config, handler http.Handler) *Server {
-	return &Server{
+//new server
+func NewServer(cfg *config.Config, handler http.Handler) *server {
+	return &server{
 		httpServer: &http.Server{
 			Addr:           ":" + cfg.HTTP.Port,
 			Handler:        handler,
@@ -23,10 +24,12 @@ func NewServer(cfg *config.Config, handler http.Handler) *Server {
 	}
 }
 
-func (s *Server) Run() error {
+//start server
+func (s *server) Run() error {
 	return s.httpServer.ListenAndServe()
 }
 
-func (s *Server) Stop(ctx context.Context) error {
+//graceful shutdown
+func (s *server) Stop(ctx context.Context) error {
 	return s.httpServer.Shutdown(ctx)
 }

@@ -10,6 +10,7 @@ import (
 
 //go:generate mockgen -source=operations.go -destination=mocks/operations/mock.go
 
+//database main methods
 type FinanceOperations interface {
 	MakeTransaction(ctx context.Context, inp *domain.TransactionInput) error
 	MakeRemittance(ctx context.Context, inp *domain.RemittanceInput) error
@@ -17,6 +18,7 @@ type FinanceOperations interface {
 	GetTransactionsList(ctx context.Context, inp *domain.TransactionsListInput) ([]TransactionsList, error)
 }
 
+//transaction from user
 func (r *FinanceRepo) MakeTransaction(ctx context.Context, inp *domain.TransactionInput) error {
 	balance := &domain.BalanceInput{
 		Id: inp.Id,
@@ -40,7 +42,7 @@ func (r *FinanceRepo) MakeTransaction(ctx context.Context, inp *domain.Transacti
 	_, err = r.db.Exec(query, inp.Sum, inp.Id)
 	if err != nil {
 		//return err
-		return NoBalance
+		return noBalance
 	}
 	err = r.CreateNewTransaction(ctx, inp.Id, transaction, inp.Sum, uuid.Nil, inp.Description, inp.IdempotencyKey)
 	if err != nil {
@@ -49,6 +51,7 @@ func (r *FinanceRepo) MakeTransaction(ctx context.Context, inp *domain.Transacti
 	return nil
 }
 
+//transaction from user to user
 func (r *FinanceRepo) MakeRemittance(ctx context.Context, inp *domain.RemittanceInput) error {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -58,7 +61,7 @@ func (r *FinanceRepo) MakeRemittance(ctx context.Context, inp *domain.Remittance
 
 	_, err = r.GetBalance(ctx, &domain.BalanceInput{Id: inp.IdFrom})
 	if err != nil {
-		return NoBalance
+		return noBalance
 	}
 
 	_, err = r.GetBalance(ctx, &domain.BalanceInput{Id: inp.IdTo})
@@ -72,7 +75,7 @@ func (r *FinanceRepo) MakeRemittance(ctx context.Context, inp *domain.Remittance
 	query := fmt.Sprintf("UPDATE %s SET balance = balance - $1  WHERE id = $2", financeTable)
 	_, err = r.db.Exec(query, inp.Sum, inp.IdFrom)
 	if err != nil {
-		return NoBalance
+		return noBalance
 	}
 
 	query = fmt.Sprintf("UPDATE %s SET balance = balance + $1  WHERE id = $2", financeTable)
@@ -92,6 +95,7 @@ func (r *FinanceRepo) MakeRemittance(ctx context.Context, inp *domain.Remittance
 	return nil
 }
 
+//user balance
 func (r *FinanceRepo) GetBalance(ctx context.Context, inp *domain.BalanceInput) (float64, error) {
 	println("GetBalance")
 
@@ -99,11 +103,12 @@ func (r *FinanceRepo) GetBalance(ctx context.Context, inp *domain.BalanceInput) 
 	query := fmt.Sprintf(`SELECT balance FROM %s WHERE id=$1`, financeTable)
 	err := r.db.Get(&currentBalance, query, inp.Id)
 	if err != nil {
-		return 0, NoBalance
+		return 0, noBalance
 	}
 	return currentBalance, nil
 }
 
+//list of all transactions  by query
 func (r *FinanceRepo) GetTransactionsList(ctx context.Context, inp *domain.TransactionsListInput) ([]TransactionsList, error) {
 	limit := 5
 	var list []TransactionsList

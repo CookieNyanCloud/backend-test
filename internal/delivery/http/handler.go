@@ -8,22 +8,23 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//services handler
-type Handler struct {
+type handler struct {
 	service    service.IFinance
 	curService service.ICurrency
 	cache      redis.ICache
 }
 
-func NewHandler(service service.IFinance, curService service.ICurrency, cache redis.ICache) *Handler {
-	return &Handler{
+//new handler struct
+func NewHandler(service service.IFinance, curService service.ICurrency, cache redis.ICache) *handler {
+	return &handler{
 		service:    service,
 		curService: curService,
 		cache:      cache,
 	}
 }
 
-func (h *Handler) Init(cfg *config.Config) *gin.Engine {
+//initiate gin
+func (h *handler) Init(cfg *config.Config) *gin.Engine {
 	router := gin.Default()
 	router.Use(
 		corsMiddleware,
@@ -32,7 +33,7 @@ func (h *Handler) Init(cfg *config.Config) *gin.Engine {
 	return router
 }
 
-func (h *Handler) initAPI(router *gin.Engine) {
+func (h *handler) initAPI(router *gin.Engine) {
 
 	handlerV1 := v1.NewHandler(h.service, h.curService, h.cache)
 	api := router.Group("/api")

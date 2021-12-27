@@ -31,6 +31,7 @@ const (
 	start = "start"
 )
 
+//application initiation
 func Run(configPath string, local bool) {
 	ctx := context.Background()
 
@@ -44,13 +45,13 @@ func Run(configPath string, local bool) {
 	repos := repository.NewFinanceRepo(postgresClient)
 
 	//init cache
-	cacheClient, err := cache.NewRedisClient(cfg.Redis.Addr, ctx)
+	cacheClient, err := cache.NewRedisClient(ctx, cfg.Redis.Addr)
 	logger.Errorf(initCacheErr, err)
 	cacheService := redis.NewCache(cacheClient)
 
 	//init services
 	financeService := service.NewFinanceService(repos)
-	curService := service.CurService{ApiKey: cfg.ApiKey}
+	curService := service.NewCurService(cfg.ApiKey)
 
 	//http
 	handlers := delivery.NewHandler(financeService, curService, cacheService)
