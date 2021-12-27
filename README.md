@@ -40,6 +40,12 @@ host=db
     "message": "удачная транзакция"
 }
 ```
+- если ключ был скеширован, то код 409 и 
+```json
+{
+    "message": "повторный запрос"
+}
+```
 
 # перевод
 - POST `http://localhost:8090/api/v1/operation/remittance`
@@ -48,7 +54,7 @@ host=db
 {
     "id_from":"a8887f18-b68e-4999-9c33-cc8ecbdf8c2c",
     "id_to":"bc5f99f1-6808-4631-9eb0-e99f51e69bc8",
-    "sum":"200000",
+    "sum":200000,
     "description":"tests"
 }
 ```

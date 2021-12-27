@@ -123,25 +123,20 @@ func (h *Handler) TransactionsList(c *gin.Context) {
 }
 
 func (h *Handler) CheckCache(c *gin.Context, key uuid.UUID) bool {
-	fmt.Println("CheckCache")
 	state, err := h.cache.CheckKey(c, key)
 	if err != nil {
 		h.newResponse(c, http.StatusInternalServerError, cacheFail, err)
 		return true
 	}
 	if state == true {
-		fmt.Println("CheckCache 1")
-		h.newResponse(c, http.StatusAccepted, duplicate, nil)
+		h.newResponse(c, http.StatusConflict, duplicate, nil)
 		return true
 	} else {
-		fmt.Println("CheckCache 2")
-
 		if err := h.cache.CacheKey(c, key); err != nil {
 			h.newResponse(c, http.StatusInternalServerError, cacheFail, err)
 			return true
 		}
 	}
 
-	fmt.Println("CheckCache 0")
 	return false
 }

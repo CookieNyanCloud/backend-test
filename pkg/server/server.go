@@ -2,8 +2,9 @@ package server
 
 import (
 	"context"
-	"github.com/cookienyancloud/avito-backend-test/internal/config"
 	"net/http"
+
+	"github.com/cookienyancloud/avito-backend-test/internal/config"
 )
 
 type Server struct {

@@ -18,7 +18,6 @@ type FinanceOperations interface {
 }
 
 func (r *FinanceRepo) MakeTransaction(ctx context.Context, inp *domain.TransactionInput) error {
-	println("MakeTransaction")
 	balance := &domain.BalanceInput{
 		Id: inp.Id,
 	}
