@@ -1,5 +1,4 @@
-[![GoReportCard](https://goreportcard.com/badge/github.com/cookienyancloud/backend-test)](https://goreportcard.com/report/github.com/cookienyancloud/backend-test)
-
+[![Go Report Card](https://goreportcard.com/badge/github.com/cookienyancloud/avito-backend-test)](https://goreportcard.com/report/github.com/cookienyancloud/avito-backend-test)
 # Тестовое задание
 
 ## Запуск
