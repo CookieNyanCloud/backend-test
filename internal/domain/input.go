@@ -27,7 +27,7 @@ type BalanceInput struct {
 //user input for list of transactions
 type TransactionsListInput struct {
 	Id   uuid.UUID `json:"id" binding:"required"`
-	Sort string
-	Dir  string
-	Page int
+	Sort string    `json:"-"`
+	Dir  string    `json:"-"`
+	Page int       `json:"-"`
 }
