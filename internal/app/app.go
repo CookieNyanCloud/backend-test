@@ -20,33 +20,22 @@ import (
 	"github.com/cookienyancloud/avito-backend-test/pkg/server"
 )
 
-const (
-	initEnvErr           = "error initializing env: %w"
-	initDbErr            = "error initializing database: %w"
-	initCacheErr         = "error initializing cache: %w"
-	serverErr            = "error during http server work: %w"
-	stopServerErr        = "error trying to stop server: %w"
-	closeDbConnectionErr = "error closing database connection: %w"
-
-	start = "start"
-)
-
 //application initiation
 func Run(configPath string, local bool) {
 	ctx := context.Background()
 
 	//init config
 	cfg, err := config.Init(configPath, local)
-	logger.Errorf(initEnvErr, err)
+	logger.Errorf("error initializing env: %w", err)
 
 	//init db
 	postgresClient, err := postgres.NewClient(cfg.Postgres)
-	logger.Errorf(initDbErr, err)
+	logger.Errorf("error initializing database: %w", err)
 	repos := repository.NewFinanceRepo(postgresClient)
 
 	//init cache
 	cacheClient, err := cache.NewRedisClient(ctx, cfg.Redis.Addr)
-	logger.Errorf(initCacheErr, err)
+	logger.Errorf("error initializing cache: %w", err)
 	cacheService := redis.NewCache(cacheClient)
 
 	//init services
@@ -60,10 +49,10 @@ func Run(configPath string, local bool) {
 	srv := server.NewServer(cfg, handlers.Init(cfg))
 	go func() {
 		if err := srv.Run(); !errors.Is(err, http.ErrServerClosed) {
-			logger.Errorf(serverErr, err)
+			logger.Errorf("error during http server work: %w", err)
 		}
 	}()
-	logger.Info(start)
+	logger.Info("start")
 
 	//quit
 	quit := make(chan os.Signal, 1)
@@ -73,8 +62,8 @@ func Run(configPath string, local bool) {
 	ctx, shutdown := context.WithTimeout(context.Background(), timeout)
 	defer shutdown()
 	err = srv.Stop(ctx)
-	logger.Errorf(stopServerErr, err)
+	logger.Errorf("error trying to stop server: %w", err)
 	err = postgresClient.Close()
-	logger.Errorf(closeDbConnectionErr, err)
+	logger.Errorf("error closing database connection: %w", err)
 
 }

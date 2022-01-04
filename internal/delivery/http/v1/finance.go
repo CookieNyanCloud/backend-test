@@ -30,7 +30,6 @@ const (
 
 //handle user transactions request
 func (h *handler) Transaction(c *gin.Context) {
-
 	var inp domain.TransactionInput
 	if err := c.BindJSON(&inp); err != nil {
 		h.newResponse(c, http.StatusBadRequest, userFail, err)

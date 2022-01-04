@@ -17,6 +17,7 @@ require (
 
 require (
 	github.com/go-redis/redis/v8 v8.11.4
+	github.com/jackc/pgx/v4 v4.14.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/stretchr/objx v0.2.0 // indirect

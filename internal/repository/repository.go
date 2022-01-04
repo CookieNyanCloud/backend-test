@@ -11,6 +11,7 @@ import (
 //struct for communication with database
 type FinanceRepo struct {
 	db *sqlx.DB
+	//db *pgx.Conn
 }
 
 type IFinanceRepo interface {
@@ -19,7 +20,7 @@ type IFinanceRepo interface {
 }
 
 //new struct
-func NewFinanceRepo(db *sqlx.DB) IFinanceRepo {
+func NewFinanceRepo(db *sqlx.DB) *FinanceRepo {
 	return &FinanceRepo{db: db}
 }
 

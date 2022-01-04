@@ -16,7 +16,7 @@ type curService struct {
 }
 
 //init service
-func NewCurService(apiKey string) ICurrency {
+func NewCurService(apiKey string) *curService {
 	return &curService{ApiKey: apiKey}
 }
 

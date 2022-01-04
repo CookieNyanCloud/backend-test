@@ -12,8 +12,7 @@ const configsDir = "configs"
 
 func main() {
 	var local bool
-	flag.BoolVar(&local, "local", false, "хост")
+	flag.BoolVar(&local, "local", false, "host")
 	flag.Parse()
-	println(local)
 	app.Run(configsDir, local)
 }

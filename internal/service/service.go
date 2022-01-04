@@ -11,7 +11,7 @@ type FinanceService struct {
 	repo repository.FinanceOperations
 }
 
-func NewFinanceService(repo repository.FinanceOperations) IFinance {
+func NewFinanceService(repo repository.FinanceOperations) *FinanceService {
 	return &FinanceService{repo}
 }
 
