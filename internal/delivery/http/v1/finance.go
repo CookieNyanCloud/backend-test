@@ -138,8 +138,7 @@ func (h *handler) CheckCache(c *gin.Context, key uuid.UUID) bool {
 	}
 	if err := h.cache.CacheKey(c, key); err != nil {
 		h.newResponse(c, http.StatusInternalServerError, cacheFail, err)
-		return true
+		return false
 	}
-
 	return false
 }
