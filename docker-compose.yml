@@ -4,7 +4,6 @@ services:
   backend-test:
     container_name: backend-test
     build: ./
-#    command: ./wait-for-postgres.sh db ./backend-testdock
     ports:
       - 8090:8090
     depends_on:

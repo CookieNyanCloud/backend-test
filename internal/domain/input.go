@@ -1,6 +1,10 @@
 package domain
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 //user input for transaction
 type TransactionInput struct {
@@ -21,7 +25,8 @@ type RemittanceInput struct {
 
 //user input for balance
 type BalanceInput struct {
-	Id uuid.UUID `json:"id" binding:"required"`
+	Id  uuid.UUID `json:"id" binding:"required"`
+	//Cur string    `json:"-"`
 }
 
 //user input for list of transactions
@@ -30,4 +35,15 @@ type TransactionsListInput struct {
 	Sort string    `json:"-"`
 	Dir  string    `json:"-"`
 	Page int       `json:"-"`
+}
+
+//struct for  transactions list request
+type TransactionsList struct {
+	Id             uuid.UUID `json:"id" db:"user_id"`
+	Operation      string    `json:"operation"db:"operation"`
+	Sum            float64   `json:"sum" db:"sum"`
+	Date           time.Time `json:"date" db:"date"`
+	Description    string    `json:"description,omitempty" db:"description"`
+	IdTo           uuid.UUID `json:"id_to,omitempty" db:"user_to"`
+	IdempotencyKey uuid.UUID `json:"idempotency_key" db:"idempotency_key"`
 }

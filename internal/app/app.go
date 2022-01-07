@@ -58,6 +58,7 @@ func Run(configPath string, local bool) {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
 	<-quit
+	logger.Info("stop")
 	const timeout = 5 * time.Second
 	ctx, shutdown := context.WithTimeout(context.Background(), timeout)
 	defer shutdown()

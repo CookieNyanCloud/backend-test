@@ -35,7 +35,7 @@ func (h *handler) Transaction(c *gin.Context) {
 		h.newResponse(c, http.StatusBadRequest, userFail, err)
 		return
 	}
-	if is := h.CheckCache(c, inp.IdempotencyKey); is {
+	if is := h.checkCache(c, inp.IdempotencyKey); is {
 		return
 	}
 	if err := h.services.MakeTransaction(c, &inp); err != nil {
@@ -54,7 +54,7 @@ func (h *handler) Remittance(c *gin.Context) {
 		return
 	}
 
-	if is := h.CheckCache(c, inp.IdempotencyKey); is {
+	if is := h.checkCache(c, inp.IdempotencyKey); is {
 		return
 	}
 	if err := h.services.MakeRemittance(c, &inp); err != nil {
@@ -115,6 +115,12 @@ func (h *handler) TransactionsList(c *gin.Context) {
 		h.newResponse(c, http.StatusInternalServerError, userFail, err)
 		return
 	}
+
+	if ok := listInputCheck(&inp); !ok {
+		h.newResponse(c, http.StatusBadRequest, userFail, nil)
+		return
+	}
+
 	inp.Page = page
 	list, err := h.services.GetTransactionsList(c, &inp)
 	if err != nil {
@@ -126,7 +132,7 @@ func (h *handler) TransactionsList(c *gin.Context) {
 }
 
 //check request in cache by key
-func (h *handler) CheckCache(c *gin.Context, key uuid.UUID) bool {
+func (h *handler) checkCache(c *gin.Context, key uuid.UUID) bool {
 	state, err := h.cache.CheckKey(c, key)
 	if err != nil {
 		h.newResponse(c, http.StatusInternalServerError, cacheFail, err)
@@ -141,4 +147,19 @@ func (h *handler) CheckCache(c *gin.Context, key uuid.UUID) bool {
 		return false
 	}
 	return false
+}
+
+func listInputCheck(inp *domain.TransactionsListInput) bool {
+	switch inp.Sort {
+	case "sum", "date":
+	default:
+		return false
+	}
+
+	switch inp.Dir {
+	case "asc", "desc":
+	default:
+		return false
+	}
+	return true
 }

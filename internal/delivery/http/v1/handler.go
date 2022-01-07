@@ -9,13 +9,13 @@ import (
 )
 
 type handler struct {
-	services   service.IFinance
+	services   service.IService
 	curService service.ICurrency
 	cache      redis.ICache
 }
 
 //new handler instance
-func NewHandler(services service.IFinance, curService service.ICurrency, cache redis.ICache) *handler {
+func NewHandler(services service.IService, curService service.ICurrency, cache redis.ICache) *handler {
 	return &handler{
 		services:   services,
 		curService: curService,
@@ -31,6 +31,8 @@ func (h *handler) Init(api *gin.RouterGroup) {
 }
 
 func (h *handler) newResponse(c *gin.Context, statusCode int, message string, err error) {
-	logger.Error(err)
+	if err != nil {
+		logger.Error(err)
+	}
 	c.AbortWithStatusJSON(statusCode, domain.Response{message})
 }

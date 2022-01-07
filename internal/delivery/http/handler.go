@@ -9,13 +9,13 @@ import (
 )
 
 type handler struct {
-	service    service.IFinance
+	service    service.IService
 	curService service.ICurrency
 	cache      redis.ICache
 }
 
 //new handler struct
-func NewHandler(service service.IFinance, curService service.ICurrency, cache redis.ICache) *handler {
+func NewHandler(service service.IService, curService service.ICurrency, cache redis.ICache) *handler {
 	return &handler{
 		service:    service,
 		curService: curService,

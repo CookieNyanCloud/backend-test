@@ -3,7 +3,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS userbalance
 (
     id      UUID PRIMARY KEY,
-    balance DECIMAL CHECK (balance >= 0)
+    balance DECIMAL CHECK (balance >= 0) DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS transactions
