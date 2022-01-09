@@ -10,7 +10,6 @@ import (
 //check request in cache by key
 func (h *handler) CheckCache(c *gin.Context) {
 	keyStr := c.GetHeader("Idempotence-Key")
-	c.Set(cacheState, false)
 	if keyStr == "" {
 		h.newResponse(c, http.StatusBadRequest, keyFail, nil)
 		return
@@ -33,5 +32,4 @@ func (h *handler) CheckCache(c *gin.Context) {
 		h.newResponse(c, http.StatusBadRequest, cacheFail, err)
 		return
 	}
-	c.Set(cacheState, true)
 }

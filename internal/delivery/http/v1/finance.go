@@ -35,10 +35,6 @@ const (
 
 //handle user transactions request
 func (h *handler) Transaction(c *gin.Context) {
-	state := c.GetBool("cache-state")
-	if !state {
-		return
-	}
 	var inp domain.TransactionInput
 	if err := c.BindJSON(&inp); err != nil {
 		h.newResponse(c, http.StatusBadRequest, userFail, err)
@@ -54,10 +50,6 @@ func (h *handler) Transaction(c *gin.Context) {
 
 //handle transactions request from user to user
 func (h *handler) Remittance(c *gin.Context) {
-	state := c.GetBool("cache-state")
-	if !state {
-		return
-	}
 	var inp domain.RemittanceInput
 	if err := c.BindJSON(&inp); err != nil {
 		h.newResponse(c, http.StatusBadRequest, userFail, err)
@@ -144,7 +136,6 @@ func listInputCheck(inp *domain.TransactionsListInput) bool {
 	default:
 		return false
 	}
-
 	switch inp.Dir {
 	case "asc", "desc":
 	default:
