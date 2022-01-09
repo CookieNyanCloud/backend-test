@@ -55,6 +55,7 @@ func TestTransaction(t *testing.T) {
 			cache := mock_redis.NewMockICache(c)
 			w := httptest.NewRecorder()
 			ctx, r := gin.CreateTestContext(w)
+			ctx.Set("cache-state", true)
 			tc.mockB(ctx, finService, tc.input)
 			handler := NewHandler(finService, subService, cache)
 			r.POST("/transaction", handler.Transaction)
