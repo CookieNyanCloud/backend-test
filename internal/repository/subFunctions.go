@@ -9,7 +9,7 @@ import (
 
 type IRepoSub interface {
 	CreateNewUser(ctx context.Context, id uuid.UUID) error
-	CreateNewTransaction(ctx context.Context, idFrom uuid.UUID, operation string, sum float64, idTo uuid.UUID, description string, idempotencyKey uuid.UUID) error
+	CreateNewTransaction(ctx context.Context, idFrom uuid.UUID, operation string, sum float64, idTo uuid.UUID, description string) error
 }
 
 const (
@@ -28,18 +28,18 @@ func (r *FinanceRepo) CreateNewUser(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-func (r *FinanceRepo) CreateNewTransaction(ctx context.Context, idFrom uuid.UUID, operation string, sum float64, idTo uuid.UUID, description string, idempotencyKey uuid.UUID) error {
+func (r *FinanceRepo) CreateNewTransaction(ctx context.Context, idFrom uuid.UUID, operation string, sum float64, idTo uuid.UUID, description string) error {
 	switch operation {
 	case remittance:
-		query := fmt.Sprintf("INSERT INTO %s (user_id, operation, sum, user_to, description, idempotency_key) values ($1, $2, $3, $4, $5, $6)", transactionTable)
-		_, err := r.db.Exec(query, idFrom, operation, sum, idTo, description, idempotencyKey)
+		query := fmt.Sprintf("INSERT INTO %s (user_id, operation, sum, user_to, description) values ($1, $2, $3, $4, $5)", transactionTable)
+		_, err := r.db.Exec(query, idFrom, operation, sum, idTo, description)
 		if err != nil {
 			return err
 		}
 
 	case transaction:
-		query := fmt.Sprintf("INSERT INTO %s (user_id, operation, sum, description, idempotency_key) values ($1, $2, $3, $4, $5)", transactionTable)
-		_, err := r.db.Exec(query, idFrom, operation, sum, description, idempotencyKey)
+		query := fmt.Sprintf("INSERT INTO %s (user_id, operation, sum, description) values ($1, $2, $3, $4)", transactionTable)
+		_, err := r.db.Exec(query, idFrom, operation, sum, description)
 		if err != nil {
 			return err
 		}

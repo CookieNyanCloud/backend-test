@@ -7,14 +7,17 @@ import (
 
 	"github.com/cookienyancloud/avito-backend-test/internal/domain"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 func (h *handler) initFinanceRoutes(api *gin.RouterGroup) {
 	operation := api.Group("/operation")
 	{
-		operation.POST("/transaction", h.Transaction)
-		operation.POST("/remittance", h.Remittance)
+		toBeCached := operation.Group("/", h.CheckCache)
+		{
+			toBeCached.POST("/transaction", h.Transaction)
+			toBeCached.POST("/remittance", h.Remittance)
+
+		}
 		operation.GET("/balance", h.Balance)
 		operation.GET("/transactionsList", h.TransactionsList)
 
@@ -22,20 +25,23 @@ func (h *handler) initFinanceRoutes(api *gin.RouterGroup) {
 }
 
 const (
-	success   = "удачная транзакция"
-	userFail  = "неверные данные"
-	cacheFail = "ошибка на стороне кеша"
-	duplicate = "повторный запрос"
+	success    = "удачная транзакция"
+	userFail   = "неверные данные"
+	keyFail    = "ошибка ключа"
+	cacheFail  = "ошибка на стороне кеша"
+	duplicate  = "повторный запрос"
+	cacheState = "cache-state"
 )
 
 //handle user transactions request
 func (h *handler) Transaction(c *gin.Context) {
+	state := c.GetBool("cache-state")
+	if !state {
+		return
+	}
 	var inp domain.TransactionInput
 	if err := c.BindJSON(&inp); err != nil {
 		h.newResponse(c, http.StatusBadRequest, userFail, err)
-		return
-	}
-	if is := h.checkCache(c, inp.IdempotencyKey); is {
 		return
 	}
 	if err := h.services.MakeTransaction(c, &inp); err != nil {
@@ -48,15 +54,16 @@ func (h *handler) Transaction(c *gin.Context) {
 
 //handle transactions request from user to user
 func (h *handler) Remittance(c *gin.Context) {
+	state := c.GetBool("cache-state")
+	if !state {
+		return
+	}
 	var inp domain.RemittanceInput
 	if err := c.BindJSON(&inp); err != nil {
 		h.newResponse(c, http.StatusBadRequest, userFail, err)
 		return
 	}
 
-	if is := h.checkCache(c, inp.IdempotencyKey); is {
-		return
-	}
 	if err := h.services.MakeRemittance(c, &inp); err != nil {
 		h.newResponse(c, http.StatusBadRequest, userFail, err)
 		return
@@ -129,24 +136,6 @@ func (h *handler) TransactionsList(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, list)
-}
-
-//check request in cache by key
-func (h *handler) checkCache(c *gin.Context, key uuid.UUID) bool {
-	state, err := h.cache.CheckKey(c, key)
-	if err != nil {
-		h.newResponse(c, http.StatusInternalServerError, cacheFail, err)
-		return true
-	}
-	if state {
-		h.newResponse(c, http.StatusConflict, duplicate, nil)
-		return true
-	}
-	if err := h.cache.CacheKey(c, key); err != nil {
-		h.newResponse(c, http.StatusInternalServerError, cacheFail, err)
-		return false
-	}
-	return false
 }
 
 func listInputCheck(inp *domain.TransactionsListInput) bool {

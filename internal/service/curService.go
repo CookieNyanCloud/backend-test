@@ -9,6 +9,9 @@ import (
 	"github.com/cookienyancloud/avito-backend-test/internal/domain"
 )
 
+//go:generate mockgen -source=curService.go -destination=mocks/curServiceMock.go
+
+
 const baseCurURL = "http://api.exchangeratesapi.io/v1/latest?access_key=%s&symbols=RUB,%s"
 
 type curService struct {

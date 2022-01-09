@@ -25,13 +25,13 @@ host=db
 - decimal и float64 в бд и структурах соответственно
 # начисление средств
 - POST `http://localhost:8090/api/v1/operation/transaction`
-- на входе обязательные id, IdempotencyKey (uuid),сумма (десятичная дробь), вариативно описание(до 20 символов)
+- на входе обязательные id ,сумма (десятичная дробь), вариативно описание(до 20 символов)
+- хедер Idempotency-Key (uuid)
 ```json
 {
     "id":"a8887f18-b68e-4999-9c33-cc8ecbdf8c2c",
     "sum":100.5,
-    "description":"tests",
-    "idempotency_key": "a8887f58-b68e-4999-9c33-cc8ecbdf8c2c"
+    "description":"tests"
 }
 ```
 - так как в базе данных не должно быть данных изначально, при отсутствии id запись создается
@@ -51,6 +51,7 @@ host=db
 # перевод
 - POST `http://localhost:8090/api/v1/operation/remittance`
 - на входе обязательные id отправителя и получателя (uuid),сумма (положительная), вариативно описание до 20 символов
+- хедер Idempotency-Key (uuid)
 ```json
 {
     "id_from":"a8887f18-b68e-4999-9c33-cc8ecbdf8c2c",

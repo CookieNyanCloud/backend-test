@@ -8,6 +8,8 @@ import (
 	"github.com/google/uuid"
 )
 
+//go:generate mockgen -source=service.go -destination=mocks/serviceMock.go
+
 type FinanceService struct {
 	repo repository.IRepo
 }
@@ -37,7 +39,7 @@ func (f *FinanceService) MakeTransaction(ctx context.Context, inp *domain.Transa
 	if err := f.repo.MakeTransaction(ctx, inp); err != nil {
 		return err
 	}
-	return f.repo.CreateNewTransaction(ctx, inp.Id, "transaction", inp.Sum, uuid.Nil, inp.Description, inp.IdempotencyKey)
+	return f.repo.CreateNewTransaction(ctx, inp.Id, "transaction", inp.Sum, uuid.Nil, inp.Description)
 }
 
 func (f *FinanceService) MakeRemittance(ctx context.Context, inp *domain.RemittanceInput) error {
@@ -54,7 +56,7 @@ func (f *FinanceService) MakeRemittance(ctx context.Context, inp *domain.Remitta
 	if err := f.repo.MakeRemittance(ctx, inp); err != nil {
 		return err
 	}
-	return f.repo.CreateNewTransaction(ctx, inp.IdFrom, "remittance", inp.Sum, inp.IdTo, inp.Description, inp.IdempotencyKey)
+	return f.repo.CreateNewTransaction(ctx, inp.IdFrom, "remittance", inp.Sum, inp.IdTo, inp.Description)
 }
 
 func (f *FinanceService) GetBalance(ctx context.Context, inp *domain.BalanceInput) (float64, error) {
