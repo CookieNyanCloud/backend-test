@@ -10,52 +10,34 @@ import (
 	mock_service "github.com/cookienyancloud/avito-backend-test/internal/service/mocks"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
-	"github.com/magiconair/properties/assert"
-
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTransaction(t *testing.T) {
 
-	type mockBehavior func(ctx *gin.Context, s *mock_service.MockIService, inp domain.TransactionInput)
+	type mockBehavior func(s *mock_service.MockIService, inp *domain.TransactionInput)
 
 	tt := []struct {
 		name          string
 		inpBody       string
-		input         domain.TransactionInput
+		input         *domain.TransactionInput
 		mockB         mockBehavior
-		state         bool
 		expStatusCode int
 		expReqBody    string
 	}{
 		{
-			name:    "false state",
-			inpBody: `{"id":"1993f8f2-d580-4fb1-bd8e-5bdfb7ddd7e4","sum":10,"description":"test ok"}`,
-			input: domain.TransactionInput{
-				Id:          uuid.MustParse("1993f8f2-d580-4fb1-bd8e-5bdfb7ddd7e4"),
-				Sum:         10,
-				Description: "test ok",
-			},
-			state: true,
-			mockB: func(ctx *gin.Context, s *mock_service.MockIService, inp domain.TransactionInput) {
-
-			},
-			expStatusCode: 200,
-			expReqBody:    `{"message":"удачная транзакция"}`,
-		},
-		{
 			name:    "ok",
 			inpBody: `{"id":"1993f8f2-d580-4fb1-bd8e-5bdfb7ddd7e4","sum":10,"description":"test ok"}`,
-			input: domain.TransactionInput{
+			input: &domain.TransactionInput{
 				Id:          uuid.MustParse("1993f8f2-d580-4fb1-bd8e-5bdfb7ddd7e4"),
 				Sum:         10,
 				Description: "test ok",
 			},
-			state: true,
-			mockB: func(ctx *gin.Context, s *mock_service.MockIService, inp domain.TransactionInput) {
+			mockB: func(s *mock_service.MockIService, inp *domain.TransactionInput) {
 				s.
 					EXPECT().
-					MakeTransaction(ctx, inp).
+					MakeTransaction(gomock.Any(), inp).
 					Return(nil)
 			},
 			expStatusCode: 200,
@@ -71,9 +53,10 @@ func TestTransaction(t *testing.T) {
 			subService := mock_service.NewMockICurrency(c)
 			cache := mock_redis.NewMockICache(c)
 			w := httptest.NewRecorder()
-			ctx, r := gin.CreateTestContext(w)
-			ctx.Set("cache-state", tc.state)
-			tc.mockB(ctx, finService, tc.input)
+			//ctx, r := gin.CreateTestContext(w)
+			//ctx := context.Background()
+			r := gin.New()
+			tc.mockB(finService, tc.input)
 			handler := NewHandler(finService, subService, cache)
 			r.POST("/transaction", handler.Transaction)
 			req := httptest.NewRequest("POST", "/transaction",
