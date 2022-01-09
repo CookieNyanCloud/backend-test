@@ -1,4 +1,4 @@
-package v1
+package tests
 
 import (
 	"bytes"
@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	mock_redis "github.com/cookienyancloud/avito-backend-test/internal/cache/redis/mocks"
+	"github.com/cookienyancloud/avito-backend-test/internal/delivery/http/v1"
 	"github.com/cookienyancloud/avito-backend-test/internal/domain"
 	mock_service "github.com/cookienyancloud/avito-backend-test/internal/service/mocks"
 	"github.com/gin-gonic/gin"
@@ -53,11 +54,9 @@ func TestTransaction(t *testing.T) {
 			subService := mock_service.NewMockICurrency(c)
 			cache := mock_redis.NewMockICache(c)
 			w := httptest.NewRecorder()
-			//ctx, r := gin.CreateTestContext(w)
-			//ctx := context.Background()
 			r := gin.New()
 			tc.mockB(finService, tc.input)
-			handler := NewHandler(finService, subService, cache)
+			handler := v1.NewHandler(finService, subService, cache)
 			r.POST("/transaction", handler.Transaction)
 			req := httptest.NewRequest("POST", "/transaction",
 				bytes.NewBufferString(tc.inpBody))
