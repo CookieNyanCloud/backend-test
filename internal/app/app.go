@@ -29,7 +29,7 @@ func Run(configPath string, local bool) {
 	logger.Errorf("error initializing env: %w", err)
 
 	//init db
-	postgresClient, err := postgres.NewClient(cfg.Postgres)
+	postgresClient, err := postgres.NewClient(ctx, cfg.Postgres)
 	logger.Errorf("error initializing database: %w", err)
 	repos := repository.NewFinanceRepo(postgresClient)
 
@@ -64,7 +64,7 @@ func Run(configPath string, local bool) {
 	defer shutdown()
 	err = srv.Stop(ctx)
 	logger.Errorf("error trying to stop server: %w", err)
-	err = postgresClient.Close()
+	err = postgresClient.Close(ctx)
 	logger.Errorf("error closing database connection: %w", err)
 
 }

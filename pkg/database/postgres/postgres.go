@@ -1,39 +1,34 @@
 package postgres
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
 
 	"github.com/cookienyancloud/avito-backend-test/internal/config"
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4"
 )
 
 //postgres database client
-func NewClient(cfg config.PostgresConfig) (*sqlx.DB, error) {
-	db, err := sqlx.Open("postgres",
-		fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
-			cfg.Host,
-			cfg.Port,
-			cfg.Username,
-			cfg.DBName,
-			cfg.Password,
-			cfg.SSLMode))
-	if err != nil {
-		return nil, err
-	}
-	err = db.Ping()
-	if err != nil {
-		return nil, err
-	}
+func NewClient(ctx context.Context, cfg config.PostgresConfig) (*pgx.Conn, error) {
 
+	db, err := pgx.Connect(ctx, fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
+		cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.DBName))
+	if err != nil {
+		return nil, err
+	}
+	if err := db.Ping(ctx); err != nil {
+		return nil, err
+	}
 	path := filepath.Join("schema", "000001_init_schema.up.sql")
 	c, ioErr := ioutil.ReadFile(path)
 	if ioErr != nil {
 		return nil, err
 	}
 	sql := string(c)
-	sqlx.MustExec(db, sql)
-
+	if _, err := db.Exec(ctx, sql); err != nil {
+		return nil, err
+	}
 	return db, nil
 }

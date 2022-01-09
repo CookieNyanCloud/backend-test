@@ -3,16 +3,16 @@ package repository
 import (
 	"errors"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4"
 )
 
 //struct for communication with database
 type FinanceRepo struct {
-	db *sqlx.DB
+	db *pgx.Conn
 }
 
 //new struct
-func NewFinanceRepo(db *sqlx.DB) *FinanceRepo {
+func NewFinanceRepo(db *pgx.Conn) *FinanceRepo {
 	return &FinanceRepo{db: db}
 }
 
