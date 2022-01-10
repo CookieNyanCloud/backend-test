@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/cookienyancloud/avito-backend-test/internal/domain"
 )
 
-//go:generate mockgen -source=curService.go -destination=mocks/curServiceMock.go
+//go:generate mockgen -source=curService_test.go -destination=mocks/curServiceMock.go
 
 const baseCurURL = "http://api.exchangeratesapi.io/v1/latest?access_key=%s&symbols=RUB,%s"
 
@@ -39,7 +40,7 @@ type ICurrency interface {
 
 //api currency
 func (u curService) GetCur(cur string, sum float64) (string, error) {
-	query := fmt.Sprintf(baseCurURL, u.ApiKey, cur)
+	query := fmt.Sprintf(baseCurURL, u.ApiKey, strings.ToUpper(cur))
 	res, err := http.Get(query)
 	if err != nil {
 		return "", err
@@ -59,7 +60,7 @@ func (u curService) GetCur(cur string, sum float64) (string, error) {
 	}
 	//convert
 	var userEurCur float64
-	switch i := jsondata.Rates[cur].(type) {
+	switch i := jsondata.Rates[strings.ToUpper(cur)].(type) {
 	case float64:
 		userEurCur = i
 	}
@@ -68,8 +69,6 @@ func (u curService) GetCur(cur string, sum float64) (string, error) {
 	case float64:
 		userEurRub = i
 	}
-	fmt.Println("111", curSym["USD"])
-	fmt.Println("222", curSym[cur])
 	balanceInCur := sum * userEurCur / userEurRub
-	return fmt.Sprintf("%s%.2f", curSym[cur], balanceInCur), nil
+	return fmt.Sprintf("%s%.2f", curSym[strings.ToUpper(cur)], balanceInCur), nil
 }

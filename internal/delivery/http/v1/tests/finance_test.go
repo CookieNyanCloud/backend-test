@@ -196,7 +196,7 @@ func TestBalance(t *testing.T) {
 				c.
 					EXPECT().
 					GetCur("USD", 100.1).
-					Return("12", nil)
+					Return("$12", nil)
 			},
 			expStatusCode: 200,
 			expReqBody:    `{"balanceResponse":"$12","cur":"USD"}`,
