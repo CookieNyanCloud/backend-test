@@ -12,7 +12,6 @@ import (
 
 //postgres database client
 func NewClient(ctx context.Context, cfg config.PostgresConfig) (*pgxpool.Pool, error) {
-
 	db, err := pgxpool.Connect(ctx, fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
 		cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.DBName))
 	if err != nil {
@@ -30,5 +29,6 @@ func NewClient(ctx context.Context, cfg config.PostgresConfig) (*pgxpool.Pool, e
 	if _, err := db.Exec(ctx, sql); err != nil {
 		return nil, err
 	}
+	db.Config().MaxConns = 10
 	return db, nil
 }

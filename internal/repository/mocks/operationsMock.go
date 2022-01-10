@@ -51,10 +51,10 @@ func (mr *MockIRepoMainMockRecorder) GetBalance(ctx, inp interface{}) *gomock.Ca
 }
 
 // GetTransactionsList mocks base method.
-func (m *MockIRepoMain) GetTransactionsList(ctx context.Context, inp *domain.TransactionsListInput) ([]*domain.TransactionsList, error) {
+func (m *MockIRepoMain) GetTransactionsList(ctx context.Context, inp *domain.TransactionsListInput) ([]domain.TransactionsList, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetTransactionsList", ctx, inp)
-	ret0, _ := ret[0].([]*domain.TransactionsList)
+	ret0, _ := ret[0].([]domain.TransactionsList)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

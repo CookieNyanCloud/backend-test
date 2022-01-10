@@ -48,17 +48,3 @@ func (mr *MockIRepoSubMockRecorder) CreateNewTransaction(ctx, idFrom, operation,
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateNewTransaction", reflect.TypeOf((*MockIRepoSub)(nil).CreateNewTransaction), ctx, idFrom, operation, sum, idTo, description)
 }
-
-// CreateNewUser mocks base method.
-func (m *MockIRepoSub) CreateNewUser(ctx context.Context, id uuid.UUID) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateNewUser", ctx, id)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// CreateNewUser indicates an expected call of CreateNewUser.
-func (mr *MockIRepoSubMockRecorder) CreateNewUser(ctx, id interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateNewUser", reflect.TypeOf((*MockIRepoSub)(nil).CreateNewUser), ctx, id)
-}

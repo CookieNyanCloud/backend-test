@@ -11,7 +11,6 @@ import (
 
 //go:generate mockgen -source=curService.go -destination=mocks/curServiceMock.go
 
-
 const baseCurURL = "http://api.exchangeratesapi.io/v1/latest?access_key=%s&symbols=RUB,%s"
 
 type curService struct {
@@ -69,6 +68,8 @@ func (u curService) GetCur(cur string, sum float64) (string, error) {
 	case float64:
 		userEurRub = i
 	}
+	fmt.Println("111", curSym["USD"])
+	fmt.Println("222", curSym[cur])
 	balanceInCur := sum * userEurCur / userEurRub
 	return fmt.Sprintf("%s%.2f", curSym[cur], balanceInCur), nil
 }
