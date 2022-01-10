@@ -1,18 +1,16 @@
 package repository
 
 import (
-	"errors"
-
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 //struct for communication with database
 type FinanceRepo struct {
-	db *pgx.Conn
+	db *pgxpool.Pool
 }
 
 //new struct
-func NewFinanceRepo(db *pgx.Conn) *FinanceRepo {
+func NewFinanceRepo(db *pgxpool.Pool) *FinanceRepo {
 	return &FinanceRepo{db: db}
 }
 
@@ -24,9 +22,4 @@ type IRepo interface {
 const (
 	financeTable     = "userbalance"
 	transactionTable = "transactions"
-)
-
-var (
-	noBalance        = errors.New("недостаточно средств")
-	unknownOperation = errors.New("неизвестная операция")
 )

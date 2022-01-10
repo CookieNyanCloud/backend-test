@@ -64,7 +64,7 @@ func Run(configPath string, local bool) {
 	defer shutdown()
 	err = srv.Stop(ctx)
 	logger.Errorf("error trying to stop server: %w", err)
-	err = postgresClient.Close(ctx)
+	postgresClient.Close()
 	logger.Errorf("error closing database connection: %w", err)
 
 }
