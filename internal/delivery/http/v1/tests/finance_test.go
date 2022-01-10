@@ -159,6 +159,7 @@ func TestBalance(t *testing.T) {
 	tt := []struct {
 		name          string
 		inpBody       string
+		cur           string
 		input         *domain.BalanceInput
 		mockB         mockBehavior
 		expStatusCode int
@@ -167,6 +168,7 @@ func TestBalance(t *testing.T) {
 		{
 			name:    "ok rub",
 			inpBody: `{"id":"1993f8f2-d580-4fb1-bd8e-5bdfb7ddd7e4"}`,
+			cur:     "",
 			input: &domain.BalanceInput{
 				Id: uuid.MustParse("1993f8f2-d580-4fb1-bd8e-5bdfb7ddd7e4"),
 			},
@@ -182,6 +184,7 @@ func TestBalance(t *testing.T) {
 		{
 			name:    "ok USD",
 			inpBody: `{"id":"1993f8f2-d580-4fb1-bd8e-5bdfb7ddd7e4"}`,
+			cur:     "?currency=USD",
 			input: &domain.BalanceInput{
 				Id: uuid.MustParse("1993f8f2-d580-4fb1-bd8e-5bdfb7ddd7e4"),
 			},
@@ -212,7 +215,7 @@ func TestBalance(t *testing.T) {
 			tc.mockB(finService, subService, tc.input)
 			handler := v1.NewHandler(finService, subService, cache)
 			r.GET("/balance", handler.Balance)
-			req := httptest.NewRequest("GET", "/balance?currency=USD",
+			req := httptest.NewRequest("GET", "/balance"+tc.cur,
 				bytes.NewBufferString(tc.inpBody))
 			r.ServeHTTP(w, req)
 			assert.Equal(t, tc.expStatusCode, w.Code)
