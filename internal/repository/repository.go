@@ -14,12 +14,9 @@ func NewFinanceRepo(db *pgxpool.Pool) *FinanceRepo {
 	return &FinanceRepo{db: db}
 }
 
-type IRepo interface {
-	IRepoMain
-	IRepoSub
-}
-
 const (
 	financeTable     = "userbalance"
 	transactionTable = "transactions"
+	transaction      = "transaction"
+	remittance       = "remittance"
 )

@@ -13,11 +13,14 @@ import (
 
 //go:generate mockgen -source=operations.go -destination=mocks/operationsMock.go
 
-type IRepoMain interface {
+type IRepo interface {
+	//main
 	MakeTransaction(ctx context.Context, inp *domain.TransactionInput) error
 	MakeRemittance(ctx context.Context, inp *domain.RemittanceInput) error
 	GetBalance(ctx context.Context, inp *domain.BalanceInput) (float64, error)
 	GetTransactionsList(ctx context.Context, inp *domain.TransactionsListInput) ([]domain.TransactionsList, error)
+	//sub
+	CreateNewTransaction(ctx context.Context, idFrom uuid.UUID, operation string, sum float64, idTo uuid.UUID, description string) error
 }
 
 //transaction from user
@@ -113,4 +116,26 @@ func (r *FinanceRepo) GetTransactionsList(ctx context.Context, inp *domain.Trans
 		return nil, errors.Wrap(err, "rows")
 	}
 	return list, nil
+}
+
+//list set of transactions
+func (r *FinanceRepo) CreateNewTransaction(ctx context.Context, idFrom uuid.UUID, operation string, sum float64, idTo uuid.UUID, description string) error {
+	switch operation {
+	case remittance:
+		query := fmt.Sprintf("INSERT INTO %s (user_id, operation, sum, user_to, description) values ($1, $2, $3, $4, $5)", transactionTable)
+		_, err := r.db.Exec(ctx, query, idFrom, operation, sum, idTo, description)
+		if err != nil {
+			return errors.Wrap(err, "exec remittance")
+		}
+
+	case transaction:
+		query := fmt.Sprintf("INSERT INTO %s (user_id, operation, sum, description) values ($1, $2, $3, $4)", transactionTable)
+		_, err := r.db.Exec(ctx, query, idFrom, operation, sum, description)
+		if err != nil {
+			return errors.Wrap(err, "exec transaction")
+		}
+	default:
+		return errors.New("неизвестная операция")
+	}
+	return nil
 }

@@ -24,7 +24,8 @@ require github.com/golang/mock v1.5.0
 
 require (
 	github.com/jackc/pgx/v4 v4.14.1
-	github.com/pashagolub/pgxmock v1.4.3 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
+	github.com/magiconair/properties v1.8.5
+	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.7.0
+	golang.org/x/crypto v0.0.0-20211117183948-ae814b36b871 // indirect
 )
