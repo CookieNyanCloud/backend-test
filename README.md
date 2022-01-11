@@ -145,6 +145,11 @@ host=db
 ]
 ```
 
+## структура папок
+создана моей программой https://github.com/CookieNyanCloud/dirtree
+![Tree](https://i.ibb.co/n8SygLH/tree.png)
+
+
 ## схема
 ![Schema](https://i.ibb.co/WKy1r5w/avito.png)
 
