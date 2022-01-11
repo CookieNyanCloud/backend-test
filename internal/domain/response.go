@@ -1,8 +1,9 @@
 package domain
 
 import (
-	"database/sql"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 //general response struct
@@ -18,12 +19,12 @@ type BalanceResponse struct {
 
 //response list of transactions
 type TransactionsListResponse struct {
-	Id          int           `json:"id" db:"user_id"`
-	Operation   string        `json:"operation"db:"operation"`
-	Sum         string        `json:"sum" db:"sum"`
-	Date        time.Time     `json:"date" db:"date"`
-	Description string        `json:"description,omitempty" db:"description"`
-	IdTo        sql.NullInt64 `json:"id_to,omitempty" db:"user_to"`
+	Id          uuid.UUID `json:"id" db:"user_id"`
+	Operation   string    `json:"operation"db:"operation"`
+	Sum         float64   `json:"sum" db:"sum"`
+	Date        time.Time `json:"date" db:"date"`
+	Description string    `json:"description,omitempty" db:"description"`
+	IdTo        string    `json:"id_to,omitempty" db:"user_to"`
 }
 
 //currency api struct

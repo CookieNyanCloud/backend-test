@@ -23,7 +23,7 @@ type IService interface {
 	MakeTransaction(ctx context.Context, inp *domain.TransactionInput) error
 	MakeRemittance(ctx context.Context, inp *domain.RemittanceInput) error
 	GetBalance(ctx context.Context, inp *domain.BalanceInput) (float64, error)
-	GetTransactionsList(ctx context.Context, inp *domain.TransactionsListInput) ([]domain.TransactionsList, error)
+	GetTransactionsList(ctx context.Context, inp *domain.TransactionsListInput) ([]domain.TransactionsListResponse, error)
 }
 
 func (f *FinanceService) MakeTransaction(ctx context.Context, inp *domain.TransactionInput) error {
@@ -50,6 +50,21 @@ func (f *FinanceService) GetBalance(ctx context.Context, inp *domain.BalanceInpu
 	return f.repo.GetBalance(ctx, inp)
 }
 
-func (f *FinanceService) GetTransactionsList(ctx context.Context, inp *domain.TransactionsListInput) ([]domain.TransactionsList, error) {
-	return f.repo.GetTransactionsList(ctx, inp)
+func (f *FinanceService) GetTransactionsList(ctx context.Context, inp *domain.TransactionsListInput) ([]domain.TransactionsListResponse, error) {
+	list, err := f.repo.GetTransactionsList(ctx, inp)
+	responses := make([]domain.TransactionsListResponse, len(list))
+	if err != nil {
+		return nil, err
+	}
+	for i := range list {
+		if list[i].IdTo == uuid.Nil {
+			responses[i].IdTo = ""
+		}
+		responses[i].Id = list[i].Id
+		responses[i].Description = list[i].Description
+		responses[i].Operation = list[i].Operation
+		responses[i].Date = list[i].Date
+		responses[i].Sum = list[i].Sum
+	}
+	return responses, nil
 }

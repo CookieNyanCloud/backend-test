@@ -45,5 +45,4 @@ type TransactionsList struct {
 	Date        time.Time `json:"date" db:"date"`
 	Description string    `json:"description,omitempty" db:"description"`
 	IdTo        uuid.UUID `json:"id_to,omitempty" db:"user_to"`
-	//IdempotencyKey uuid.UUID `json:"idempotency_key" db:"idempotency_key"`
 }

@@ -31,7 +31,6 @@ ON CONFLICT (id) DO UPDATE
 SET balance = %s.balance + $3`, financeTable, financeTable)
 	_, err := r.db.ExecContext(ctx, query, inp.Id, inp.Sum, inp.Sum)
 	if err != nil {
-		//return err
 		return errors.Wrap(err, "exec")
 	}
 	return nil
@@ -78,7 +77,7 @@ func (r *FinanceRepo) GetBalance(ctx context.Context, inp *domain.BalanceInput) 
 //list of all transactions  by query
 func (r *FinanceRepo) GetTransactionsList(ctx context.Context, inp *domain.TransactionsListInput) ([]domain.TransactionsList, error) {
 	limit := 5
-	list := make([]domain.TransactionsList, limit)
+	var list []domain.TransactionsList
 	//pagination
 	offset := limit * (inp.Page - 1)
 	if offset < 0 {
