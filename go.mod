@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/gin-gonic/gin v1.7.4
-	github.com/lib/pq v1.10.2
+	github.com/lib/pq v1.10.2 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.8.1
 )
@@ -23,13 +23,17 @@ require (
 require github.com/golang/mock v1.5.0
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.5.0 // indirect
-	github.com/jackc/pgx v3.6.2+incompatible // indirect
-	github.com/jackc/pgx/v4 v4.14.1
-	github.com/jmoiron/sqlx v1.3.4 // indirect
+	github.com/DATA-DOG/go-sqlmock v1.5.0
+	github.com/alicebob/miniredis/v2 v2.17.0
+	github.com/cockroachdb/apd v1.1.0 // indirect
+	github.com/go-redis/redismock/v8 v8.0.6 // indirect
+	github.com/gofrs/uuid v4.0.0+incompatible // indirect
+	github.com/jackc/fake v0.0.0-20150926172116-812a484cc733 // indirect
+	github.com/jackc/pgx v3.6.2+incompatible
+	github.com/jmoiron/sqlx v1.3.4
 	github.com/magiconair/properties v1.8.5
-	github.com/pashagolub/pgxmock v1.4.3 // indirect
 	github.com/pkg/errors v0.9.1
+	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/crypto v0.0.0-20211117183948-ae814b36b871 // indirect
 )
