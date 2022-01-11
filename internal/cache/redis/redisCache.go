@@ -11,7 +11,6 @@ import (
 
 //go:generate mockgen -source=redisCache.go -destination=mocks/redisCacheMock.go
 
-
 type Cache struct {
 	rd *cache.RedisClient
 }
