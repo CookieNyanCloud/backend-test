@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/cookienyancloud/avito-backend-test/internal/domain"
 	"github.com/gin-gonic/gin"
@@ -94,7 +95,7 @@ func (h *handler) Balance(c *gin.Context) {
 
 	c.JSON(http.StatusOK, domain.BalanceResponse{
 		Balance: balanceInCur,
-		Cur:     cur,
+		Cur:     strings.ToUpper(cur),
 	})
 }
 
