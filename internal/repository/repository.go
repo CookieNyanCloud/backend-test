@@ -1,16 +1,16 @@
 package repository
 
 import (
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jmoiron/sqlx"
 )
 
 //struct for communication with database
 type FinanceRepo struct {
-	db *pgxpool.Pool
+	db *sqlx.DB
 }
 
 //new struct
-func NewFinanceRepo(db *pgxpool.Pool) *FinanceRepo {
+func NewFinanceRepo(db *sqlx.DB) *FinanceRepo {
 	return &FinanceRepo{db: db}
 }
 

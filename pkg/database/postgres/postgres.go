@@ -7,17 +7,18 @@ import (
 	"path/filepath"
 
 	"github.com/cookienyancloud/avito-backend-test/internal/config"
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jmoiron/sqlx"
 )
 
 //postgres database client
-func NewClient(ctx context.Context, cfg config.PostgresConfig) (*pgxpool.Pool, error) {
-	db, err := pgxpool.Connect(ctx, fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
-		cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.DBName))
+func NewClient(ctx context.Context, cfg config.PostgresConfig) (*sqlx.DB, error) {
+	db, err := sqlx.Connect("pgx",
+		fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
+			cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.DBName))
 	if err != nil {
 		return nil, err
 	}
-	if err := db.Ping(ctx); err != nil {
+	if err := db.PingContext(ctx); err != nil {
 		return nil, err
 	}
 	path := filepath.Join("schema", "000001_init_schema.up.sql")
@@ -26,9 +27,8 @@ func NewClient(ctx context.Context, cfg config.PostgresConfig) (*pgxpool.Pool, e
 		return nil, err
 	}
 	sql := string(c)
-	if _, err := db.Exec(ctx, sql); err != nil {
+	if _, err := db.ExecContext(ctx, sql); err != nil {
 		return nil, err
 	}
-	db.Config().MaxConns = 10
 	return db, nil
 }

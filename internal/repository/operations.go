@@ -2,12 +2,11 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
-	"time"
 
 	"github.com/cookienyancloud/avito-backend-test/internal/domain"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
 )
 
@@ -30,7 +29,7 @@ INSERT INTO %s (id, balance)
 values ($1, $2) 
 ON CONFLICT (id) DO UPDATE 
 SET balance = %s.balance + $3`, financeTable, financeTable)
-	_, err := r.db.Exec(ctx, query, inp.Id, inp.Sum, inp.Sum)
+	_, err := r.db.ExecContext(ctx, query, inp.Id, inp.Sum, inp.Sum)
 	if err != nil {
 		//return err
 		return errors.Wrap(err, "exec")
@@ -40,28 +39,27 @@ SET balance = %s.balance + $3`, financeTable, financeTable)
 
 //transaction from user to user
 func (r *FinanceRepo) MakeRemittance(ctx context.Context, inp *domain.RemittanceInput) error {
-	tx, err := r.db.BeginTx(ctx, pgx.TxOptions{
-		IsoLevel:       pgx.ReadCommitted,
-		AccessMode:     pgx.ReadOnly,
-		DeferrableMode: pgx.Deferrable,
+	tx, err := r.db.BeginTxx(ctx, &sql.TxOptions{
+		Isolation: 0,
+		ReadOnly:  false,
 	})
 	if err != nil {
 		return errors.Wrap(err, "begin transaction")
 	}
-	defer tx.Rollback(ctx)
+	defer tx.Rollback()
 
 	query := fmt.Sprintf("UPDATE %s SET balance = balance - $1  WHERE id = $2", financeTable)
-	_, err = r.db.Exec(ctx, query, inp.Sum, inp.IdFrom)
+	_, err = r.db.ExecContext(ctx, query, inp.Sum, inp.IdFrom)
 	if err != nil {
 		return errors.Wrap(err, "update first")
 	}
 
 	query = fmt.Sprintf("UPDATE %s SET balance = balance + $1  WHERE id = $2", financeTable)
-	_, err = r.db.Exec(ctx, query, inp.Sum, inp.IdTo)
+	_, err = r.db.ExecContext(ctx, query, inp.Sum, inp.IdTo)
 	if err != nil {
 		return errors.Wrap(err, "update second")
 	}
-	if err = tx.Commit(ctx); err != nil {
+	if err = tx.Commit(); err != nil {
 		return errors.Wrap(err, "commit")
 	}
 	return nil
@@ -71,7 +69,7 @@ func (r *FinanceRepo) MakeRemittance(ctx context.Context, inp *domain.Remittance
 func (r *FinanceRepo) GetBalance(ctx context.Context, inp *domain.BalanceInput) (float64, error) {
 	var currentBalance float64
 	query := fmt.Sprintf(`SELECT balance FROM %s WHERE id=$1`, financeTable)
-	if err := r.db.QueryRow(ctx, query, inp.Id).Scan(&currentBalance); err != nil {
+	if err := r.db.QueryRowContext(ctx, query, inp.Id).Scan(&currentBalance); err != nil {
 		return 0, errors.Wrap(err, "scanning")
 	}
 	return currentBalance, nil
@@ -87,33 +85,9 @@ func (r *FinanceRepo) GetTransactionsList(ctx context.Context, inp *domain.Trans
 		offset = 0
 	}
 	query := fmt.Sprintf(`SELECT * FROM %s WHERE user_id= $1 OR user_to= $2 ORDER BY %s %s LIMIT %d OFFSET %d`, transactionTable, inp.Sort, inp.Dir, limit, offset)
-	rows, err := r.db.Query(ctx, query, inp.Id, inp.Id)
+	err := r.db.SelectContext(ctx, &list, query, inp.Id, inp.Id)
 	if err != nil {
-		return nil, errors.Wrap(err, "query")
-	}
-	var id uuid.UUID
-	var op string
-	var sum float64
-	var date time.Time
-	var desc string
-	var idTo uuid.UUID
-	if rows.Next() {
-		err := rows.Scan(&id, &op, &sum, &date, &desc, &idTo)
-		if err != nil {
-			return nil, errors.Wrap(err, "scan")
-		}
-		list = append(list, domain.TransactionsList{
-			Id:          id,
-			Operation:   op,
-			Sum:         sum,
-			Date:        date,
-			Description: desc,
-			IdTo:        idTo,
-		})
-
-	}
-	if rows.Err() != nil {
-		return nil, errors.Wrap(err, "rows")
+		return nil, errors.Wrap(err, "select")
 	}
 	return list, nil
 }
@@ -123,14 +97,14 @@ func (r *FinanceRepo) CreateNewTransaction(ctx context.Context, idFrom uuid.UUID
 	switch operation {
 	case remittance:
 		query := fmt.Sprintf("INSERT INTO %s (user_id, operation, sum, user_to, description) values ($1, $2, $3, $4, $5)", transactionTable)
-		_, err := r.db.Exec(ctx, query, idFrom, operation, sum, idTo, description)
+		_, err := r.db.ExecContext(ctx, query, idFrom, operation, sum, idTo, description)
 		if err != nil {
 			return errors.Wrap(err, "exec remittance")
 		}
 
 	case transaction:
 		query := fmt.Sprintf("INSERT INTO %s (user_id, operation, sum, description) values ($1, $2, $3, $4)", transactionTable)
-		_, err := r.db.Exec(ctx, query, idFrom, operation, sum, description)
+		_, err := r.db.ExecContext(ctx, query, idFrom, operation, sum, description)
 		if err != nil {
 			return errors.Wrap(err, "exec transaction")
 		}
