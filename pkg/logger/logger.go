@@ -4,25 +4,19 @@ import "github.com/sirupsen/logrus"
 
 //interface for logs
 type Logger interface {
-	Info(msg string)
-	Infof(msg string, params map[string]interface{})
-	Error(msg string)
-	Errorf(msg string, params map[string]interface{})
+	Info(msg ...interface{})
+	Error(err error)
+	Errorf(format string, err error)
 }
 
 //info string
 func Info(msg ...interface{}) {
-	logrus.Info(msg...)
-}
-
-//info with params
-func Infof(format string, args ...interface{}) {
-	logrus.Infof(format, args...)
+	logrus.Info(msg)
 }
 
 //error string
-func Error(msg ...interface{}) {
-	logrus.Error(msg...)
+func Error(err error) {
+	logrus.Error(err)
 }
 
 //error with params
