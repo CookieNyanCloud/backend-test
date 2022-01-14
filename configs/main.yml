@@ -1,9 +1,20 @@
+state:
+  database: "mongo"
+
 postgres:
   host:     "localhost"
   port:     "5432"
   username: "postgres"
   dbname:   "postgres"
   SSLMode:  "disable"
+  migration:
+
+mongo:
+  host:
+  port:
+  username:
+  database:
+  authDB:
 
 redis:
   addr: "redis:6379"

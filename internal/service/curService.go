@@ -33,11 +33,6 @@ var (
 	}
 )
 
-//currency interface
-type ICurrency interface {
-	GetCur(cur string, sum float64) (string, error)
-}
-
 //api currency
 func (u curService) GetCur(cur string, sum float64) (string, error) {
 	query := fmt.Sprintf(baseCurURL, u.ApiKey, strings.ToUpper(cur))

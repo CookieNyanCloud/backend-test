@@ -2,20 +2,20 @@ package app
 
 import (
 	"context"
-	"errors"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/cookienyancloud/avito-backend-test/internal/repository"
+	"github.com/pkg/errors"
+
 	"github.com/cookienyancloud/avito-backend-test/internal/cache/redis"
 	"github.com/cookienyancloud/avito-backend-test/internal/config"
 	delivery "github.com/cookienyancloud/avito-backend-test/internal/delivery/http"
-	"github.com/cookienyancloud/avito-backend-test/internal/repository"
 	"github.com/cookienyancloud/avito-backend-test/internal/service"
 	"github.com/cookienyancloud/avito-backend-test/pkg/cache"
-	"github.com/cookienyancloud/avito-backend-test/pkg/database/postgres"
 	"github.com/cookienyancloud/avito-backend-test/pkg/logger"
 	"github.com/cookienyancloud/avito-backend-test/pkg/server"
 )
@@ -26,20 +26,21 @@ func Run(configPath string, local bool) {
 
 	//init config
 	cfg, err := config.Init(configPath, local)
-	logger.Errorf("error initializing env: %w", err)
+	logger.Errorf("initializing env: %w", err)
 
 	//init db
-	postgresClient, err := postgres.NewClient(ctx, cfg.Postgres)
-	logger.Errorf("error initializing database: %w", err)
-	repos := repository.NewFinanceRepo(postgresClient)
+	repo, err := repository.SwitchDb(ctx, cfg)
+	logger.Errorf("initializing db: %w", err)
+	err = repo.StartMigration(ctx, "scheme", "000001_init_schema.up.sql")
+	logger.Errorf("migrating: %w", err)
 
 	//init cache
 	cacheClient, err := cache.NewRedisClient(ctx, cfg.Redis.Addr)
-	logger.Errorf("error initializing cache: %w", err)
+	logger.Errorf("initializing cache: %w", err)
 	cacheService := redis.NewCache(cacheClient)
 
 	//init services
-	financeService := service.NewFinanceService(repos)
+	financeService := service.NewFinanceService(repo)
 	curService := service.NewCurService(cfg.ApiKey)
 
 	//http
@@ -64,7 +65,6 @@ func Run(configPath string, local bool) {
 	defer shutdown()
 	err = srv.Stop(ctx)
 	logger.Errorf("error trying to stop server: %w", err)
-	err = postgresClient.Close()
+	err = repo.Close()
 	logger.Errorf("error closing database connection: %w", err)
-
 }

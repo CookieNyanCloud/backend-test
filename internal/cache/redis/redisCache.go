@@ -9,8 +9,6 @@ import (
 	"github.com/google/uuid"
 )
 
-//go:generate mockgen -source=redisCache.go -destination=mocks/redisCacheMock.go
-
 type Cache struct {
 	rd *cache.RedisClient
 }
@@ -19,11 +17,6 @@ func NewCache(rd *cache.RedisClient) *Cache {
 	return &Cache{
 		rd: rd,
 	}
-}
-
-type ICache interface {
-	CacheKey(ctx context.Context, key uuid.UUID) error
-	CheckKey(ctx context.Context, key uuid.UUID) (bool, error)
 }
 
 func (c Cache) CacheKey(ctx context.Context, key uuid.UUID) error {

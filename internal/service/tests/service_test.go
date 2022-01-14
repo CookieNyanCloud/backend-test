@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/cookienyancloud/avito-backend-test/internal/domain"
-	mock_repository "github.com/cookienyancloud/avito-backend-test/internal/repository/mocks"
-	service "github.com/cookienyancloud/avito-backend-test/internal/service"
+	"github.com/cookienyancloud/avito-backend-test/internal/service"
+	mock_repository "github.com/cookienyancloud/avito-backend-test/internal/service/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	"github.com/magiconair/properties/assert"

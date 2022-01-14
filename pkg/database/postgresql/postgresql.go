@@ -1,10 +1,8 @@
-package postgres
+package postgresql
 
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
-	"path/filepath"
 
 	"github.com/cookienyancloud/avito-backend-test/internal/config"
 	"github.com/jmoiron/sqlx"
@@ -19,15 +17,6 @@ func NewClient(ctx context.Context, cfg config.PostgresConfig) (*sqlx.DB, error)
 		return nil, err
 	}
 	if err := db.PingContext(ctx); err != nil {
-		return nil, err
-	}
-	path := filepath.Join("schema", "000001_init_schema.up.sql")
-	c, ioErr := ioutil.ReadFile(path)
-	if ioErr != nil {
-		return nil, err
-	}
-	sql := string(c)
-	if _, err := db.ExecContext(ctx, sql); err != nil {
 		return nil, err
 	}
 	return db, nil

@@ -10,8 +10,10 @@ type (
 	//configuration struct
 	Config struct {
 		Postgres PostgresConfig
+		Mongo    MongoConfig
 		HTTP     HTTPConfig
 		Redis    RedisConfig
+		State    StateConfig
 		ApiKey   string
 	}
 	//postgres vars
@@ -23,6 +25,17 @@ type (
 		SSLMode  string
 		Password string
 	}
+
+	//mongodb vars
+	MongoConfig struct {
+		Host     string
+		Port     string
+		Username string
+		Password string
+		database string
+		AuthDB   string
+	}
+
 	//http server vars
 	HTTPConfig struct {
 		Host               string
@@ -31,9 +44,15 @@ type (
 		WriteTimeout       time.Duration
 		MaxHeaderMegabytes int
 	}
+
 	//redis cache vars
 	RedisConfig struct {
 		Addr string
+	}
+
+	//state vars
+	StateConfig struct {
+		DataBase string
 	}
 )
 
@@ -60,6 +79,7 @@ func Init(configDir string, local bool) (*Config, error) {
 		return nil, err
 	}
 	cfg.Postgres.Password = viper.GetString("postgres_password")
+	cfg.Mongo.Password = viper.GetString("mongo__password")
 	cfg.ApiKey = viper.GetString("api_key")
 	if !local {
 		cfg.Postgres.Host = viper.GetString("host")

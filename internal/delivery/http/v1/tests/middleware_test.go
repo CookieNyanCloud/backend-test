@@ -4,9 +4,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	mock_redis "github.com/cookienyancloud/avito-backend-test/internal/cache/redis/mocks"
+	mock_service "github.com/cookienyancloud/avito-backend-test/internal/delivery/http/mocks"
 	v1 "github.com/cookienyancloud/avito-backend-test/internal/delivery/http/v1"
-	mock_service "github.com/cookienyancloud/avito-backend-test/internal/service/mocks"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
@@ -14,7 +13,7 @@ import (
 )
 
 func TestCheckCache(t *testing.T) {
-	type mockBehavior func(c *mock_redis.MockICache)
+	type mockBehavior func(c *mock_service.MockICache)
 
 	tt := []struct {
 		name          string
@@ -28,7 +27,7 @@ func TestCheckCache(t *testing.T) {
 			name:        "OK full way",
 			headerName:  "Idempotence-Key",
 			headerValue: "1993f8f2-d580-4fb1-bd8e-5bdfb7ddd7e4",
-			mockB: func(c *mock_redis.MockICache) {
+			mockB: func(c *mock_service.MockICache) {
 				key := uuid.MustParse("1993f8f2-d580-4fb1-bd8e-5bdfb7ddd7e4")
 				c.EXPECT().
 					CheckKey(gomock.Any(), key).
@@ -48,7 +47,7 @@ func TestCheckCache(t *testing.T) {
 			defer c.Finish()
 			finService := mock_service.NewMockIService(c)
 			subService := mock_service.NewMockICurrency(c)
-			cache := mock_redis.NewMockICache(c)
+			cache := mock_service.NewMockICache(c)
 			r := gin.New()
 			tc.mockB(cache)
 			handler := v1.NewHandler(finService, subService, cache)

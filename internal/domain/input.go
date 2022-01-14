@@ -11,7 +11,6 @@ type TransactionInput struct {
 	Id          uuid.UUID `json:"id" binding:"required"`
 	Sum         float64   `json:"sum" binding:"required"`
 	Description string    `json:"description" binding:"max=20"`
-	//IdempotencyKey uuid.UUID `json:"idempotency_key" binding:"required"`
 }
 
 //user input for remittance

@@ -1,26 +1,34 @@
-package repository
+package postgres
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
 
 	"github.com/cookienyancloud/avito-backend-test/internal/domain"
 	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
 
-//go:generate mockgen -source=operations.go -destination=mocks/operationsMock.go
-
-type IRepo interface {
-	//main
-	MakeTransaction(ctx context.Context, inp *domain.TransactionInput) error
-	MakeRemittance(ctx context.Context, inp *domain.RemittanceInput) error
-	GetBalance(ctx context.Context, inp *domain.BalanceInput) (float64, error)
-	GetTransactionsList(ctx context.Context, inp *domain.TransactionsListInput) ([]domain.TransactionsList, error)
-	//sub
-	CreateNewTransaction(ctx context.Context, idFrom uuid.UUID, operation string, sum float64, idTo uuid.UUID, description string) error
+//struct for communication with database
+type FinanceRepo struct {
+	db *sqlx.DB
 }
+
+//new struct
+func NewFinanceRepo(db *sqlx.DB) *FinanceRepo {
+	return &FinanceRepo{db: db}
+}
+
+const (
+	financeTable     = "userbalance"
+	transactionTable = "transactions"
+	transaction      = "transaction"
+	remittance       = "remittance"
+)
 
 //transaction from user
 func (r *FinanceRepo) MakeTransaction(ctx context.Context, inp *domain.TransactionInput) error {
@@ -91,7 +99,7 @@ func (r *FinanceRepo) GetTransactionsList(ctx context.Context, inp *domain.Trans
 	return list, nil
 }
 
-//list set of transactions
+//create transaction
 func (r *FinanceRepo) CreateNewTransaction(ctx context.Context, idFrom uuid.UUID, operation string, sum float64, idTo uuid.UUID, description string) error {
 	switch operation {
 	case remittance:
@@ -111,4 +119,23 @@ func (r *FinanceRepo) CreateNewTransaction(ctx context.Context, idFrom uuid.UUID
 		return errors.New("неизвестная операция")
 	}
 	return nil
+}
+
+//start migration
+func (r *FinanceRepo) StartMigration(ctx context.Context, dir, dest string) error {
+	path := filepath.Join(dir, dest)
+	c, err := ioutil.ReadFile(path)
+	if err != nil {
+		return errors.Wrap(err, "read file")
+	}
+	sqlStr := string(c)
+	if _, err := r.db.ExecContext(ctx, sqlStr); err != nil {
+		return errors.Wrap(err, "execute")
+	}
+	return nil
+}
+
+//close db
+func (r *FinanceRepo) Close(ctx context.Context) error {
+	return r.db.Close()
 }

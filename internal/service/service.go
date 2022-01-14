@@ -4,26 +4,30 @@ import (
 	"context"
 
 	"github.com/cookienyancloud/avito-backend-test/internal/domain"
-	"github.com/cookienyancloud/avito-backend-test/internal/repository"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )
 
-//go:generate mockgen -source=service.go -destination=mocks/serviceMock.go
+//go:generate mockgen -source=service.go -destination=mocks/RepoMock.go
 
-type FinanceService struct {
-	repo repository.IRepo
-}
-
-func NewFinanceService(repo repository.IRepo) *FinanceService {
-	return &FinanceService{repo}
-}
-
-type IService interface {
+type IRepo interface {
+	//main
 	MakeTransaction(ctx context.Context, inp *domain.TransactionInput) error
 	MakeRemittance(ctx context.Context, inp *domain.RemittanceInput) error
 	GetBalance(ctx context.Context, inp *domain.BalanceInput) (float64, error)
-	GetTransactionsList(ctx context.Context, inp *domain.TransactionsListInput) ([]domain.TransactionsListResponse, error)
+	GetTransactionsList(ctx context.Context, inp *domain.TransactionsListInput) ([]domain.TransactionsList, error)
+	//sub
+	CreateNewTransaction(ctx context.Context, idFrom uuid.UUID, operation string, sum float64, idTo uuid.UUID, description string) error
+	StartMigration(ctx context.Context, dir, dest string) error
+	Close(ctx context.Context) error
+}
+
+type FinanceService struct {
+	repo IRepo
+}
+
+func NewFinanceService(repo IRepo) *FinanceService {
+	return &FinanceService{repo}
 }
 
 func (f *FinanceService) MakeTransaction(ctx context.Context, inp *domain.TransactionInput) error {
@@ -52,10 +56,10 @@ func (f *FinanceService) GetBalance(ctx context.Context, inp *domain.BalanceInpu
 
 func (f *FinanceService) GetTransactionsList(ctx context.Context, inp *domain.TransactionsListInput) ([]domain.TransactionsListResponse, error) {
 	list, err := f.repo.GetTransactionsList(ctx, inp)
-	responses := make([]domain.TransactionsListResponse, len(list))
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "get list")
 	}
+	responses := make([]domain.TransactionsListResponse, len(list))
 	for i := range list {
 		if list[i].IdTo == uuid.Nil {
 			responses[i].IdTo = ""
@@ -67,4 +71,12 @@ func (f *FinanceService) GetTransactionsList(ctx context.Context, inp *domain.Tr
 		responses[i].Sum = list[i].Sum
 	}
 	return responses, nil
+}
+
+func (f *FinanceService) StartMigration(ctx context.Context, dir, dest string) error {
+	return f.repo.StartMigration(ctx, dir, dest)
+}
+
+func (f *FinanceService) Close(ctx context.Context) error {
+	return f.repo.Close(ctx)
 }

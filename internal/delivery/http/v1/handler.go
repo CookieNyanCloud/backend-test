@@ -1,21 +1,20 @@
 package v1
 
 import (
-	"github.com/cookienyancloud/avito-backend-test/internal/cache/redis"
+	delivery "github.com/cookienyancloud/avito-backend-test/internal/delivery/http"
 	"github.com/cookienyancloud/avito-backend-test/internal/domain"
-	"github.com/cookienyancloud/avito-backend-test/internal/service"
 	"github.com/cookienyancloud/avito-backend-test/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
 type handler struct {
-	services   service.IService
-	curService service.ICurrency
-	cache      redis.ICache
+	services   delivery.IService
+	curService delivery.ICurrency
+	cache      delivery.ICache
 }
 
 //new handler instance
-func NewHandler(services service.IService, curService service.ICurrency, cache redis.ICache) *handler {
+func NewHandler(services delivery.IService, curService delivery.ICurrency, cache delivery.ICache) *handler {
 	return &handler{
 		services:   services,
 		curService: curService,
