@@ -1,3 +1,6 @@
+state:
+  database: "postgres"
+
 postgres:
   host:     "localhost"
   port:     "5432"
@@ -9,7 +12,7 @@ redis:
   addr: "redis:6379"
 
 http:
-  port:           8090
+  port:           8091
   maxHeaderBytes: 1
   readTimeout:    10s
   writeTimeout:   10s

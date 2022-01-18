@@ -26,12 +26,11 @@ func (h *handler) initFinanceRoutes(api *gin.RouterGroup) {
 }
 
 const (
-	success    = "удачная транзакция"
-	userFail   = "неверные данные"
-	keyFail    = "ошибка ключа"
-	cacheFail  = "ошибка на стороне кеша"
-	duplicate  = "повторный запрос"
-	cacheState = "cache-state"
+	success   = "удачная транзакция"
+	userFail  = "неверные данные"
+	keyFail   = "ошибка ключа"
+	cacheFail = "ошибка на стороне кеша"
+	duplicate = "повторный запрос"
 )
 
 //handle user transactions request
@@ -45,7 +44,7 @@ func (h *handler) Transaction(c *gin.Context) {
 		h.newResponse(c, http.StatusBadRequest, userFail, err)
 		return
 	}
-	c.JSON(http.StatusOK, domain.Response{success})
+	c.JSON(http.StatusOK, domain.Response{Message: success})
 
 }
 
@@ -61,7 +60,7 @@ func (h *handler) Remittance(c *gin.Context) {
 		h.newResponse(c, http.StatusBadRequest, userFail, err)
 		return
 	}
-	c.JSON(http.StatusOK, domain.Response{success})
+	c.JSON(http.StatusOK, domain.Response{Message: success})
 
 }
 

@@ -8,5 +8,7 @@ mock:
 	go generate -v ./...
 test:
 	go test ./... -v
+lint:
+	golangci-lint run
 
-.PHONY: run up build down mock test
+.PHONY: run up build down mock test lint

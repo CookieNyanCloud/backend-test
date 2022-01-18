@@ -11,7 +11,7 @@ type Logger interface {
 
 //info string
 func Info(msg ...interface{}) {
-	logrus.Info(msg)
+	logrus.Info(msg...)
 }
 
 //error string

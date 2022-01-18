@@ -1,4 +1,4 @@
-package http
+package httprest
 
 import (
 	"net/http"

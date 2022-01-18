@@ -38,7 +38,7 @@ func TestCacheKey(t *testing.T) {
 	}
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			mockClient := &cache.RedisClient{db}
+			mockClient := &cache.RedisClient{Client: db}
 			mockRedis := redis.NewCache(mockClient)
 			tc.mockB(tc.key, tc.val, tc.dur)
 			err := mockRedis.CacheKey(context.Background(), tc.key)
@@ -77,7 +77,7 @@ func TestCheckKey(t *testing.T) {
 	}
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			mockClient := &cache.RedisClient{db}
+			mockClient := &cache.RedisClient{Client: db}
 			mockRedis := redis.NewCache(mockClient)
 			tc.mockB(tc.key)
 			state, err := mockRedis.CheckKey(context.Background(), tc.key)

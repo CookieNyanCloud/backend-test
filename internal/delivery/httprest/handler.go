@@ -1,21 +1,19 @@
-package http
+package httprest
 
 import (
-	"github.com/cookienyancloud/avito-backend-test/internal/cache/redis"
 	"github.com/cookienyancloud/avito-backend-test/internal/config"
-	v1 "github.com/cookienyancloud/avito-backend-test/internal/delivery/http/v1"
-	"github.com/cookienyancloud/avito-backend-test/internal/service"
+	v1 "github.com/cookienyancloud/avito-backend-test/internal/delivery/httprest/v1"
 	"github.com/gin-gonic/gin"
 )
 
 type handler struct {
-	service    service.IService
-	curService service.ICurrency
-	cache      redis.ICache
+	service    v1.IService
+	curService v1.ICurrency
+	cache      v1.ICache
 }
 
 //new handler struct
-func NewHandler(service service.IService, curService service.ICurrency, cache redis.ICache) *handler {
+func NewHandler(service v1.IService, curService v1.ICurrency, cache v1.ICache) *handler {
 	return &handler{
 		service:    service,
 		curService: curService,

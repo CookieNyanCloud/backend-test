@@ -11,11 +11,10 @@ import (
 
 	"github.com/cookienyancloud/avito-backend-test/internal/cache/redis"
 	"github.com/cookienyancloud/avito-backend-test/internal/config"
-	delivery "github.com/cookienyancloud/avito-backend-test/internal/delivery/http"
+	delivery "github.com/cookienyancloud/avito-backend-test/internal/delivery/httprest"
 	"github.com/cookienyancloud/avito-backend-test/internal/repository"
 	"github.com/cookienyancloud/avito-backend-test/internal/service"
 	"github.com/cookienyancloud/avito-backend-test/pkg/cache"
-	"github.com/cookienyancloud/avito-backend-test/pkg/database/postgres"
 	"github.com/cookienyancloud/avito-backend-test/pkg/logger"
 	"github.com/cookienyancloud/avito-backend-test/pkg/server"
 )
@@ -26,20 +25,19 @@ func Run(configPath string, local bool) {
 
 	//init config
 	cfg, err := config.Init(configPath, local)
-	logger.Errorf("error initializing env: %w", err)
+	logger.Errorf("error initializing env: %v", err)
 
 	//init db
-	postgresClient, err := postgres.NewClient(ctx, cfg.Postgres)
-	logger.Errorf("error initializing database: %w", err)
-	repos := repository.NewFinanceRepo(postgresClient)
+	repo, err := repository.SwitchDb(ctx, cfg)
+	logger.Errorf("initializing db: %v", err)
 
 	//init cache
 	cacheClient, err := cache.NewRedisClient(ctx, cfg.Redis.Addr)
-	logger.Errorf("error initializing cache: %w", err)
+	logger.Errorf("error initializing cache: %v", err)
 	cacheService := redis.NewCache(cacheClient)
 
 	//init services
-	financeService := service.NewFinanceService(repos)
+	financeService := service.NewFinanceService(repo)
 	curService := service.NewCurService(cfg.ApiKey)
 
 	//http
@@ -49,7 +47,7 @@ func Run(configPath string, local bool) {
 	srv := server.NewServer(cfg, handlers.Init(cfg))
 	go func() {
 		if err := srv.Run(); !errors.Is(err, http.ErrServerClosed) {
-			logger.Errorf("error during http server work: %w", err)
+			logger.Errorf("error during http server work: %v", err)
 		}
 	}()
 	logger.Info("start")
@@ -63,8 +61,8 @@ func Run(configPath string, local bool) {
 	ctx, shutdown := context.WithTimeout(context.Background(), timeout)
 	defer shutdown()
 	err = srv.Stop(ctx)
-	logger.Errorf("error trying to stop server: %w", err)
-	err = postgresClient.Close()
-	logger.Errorf("error closing database connection: %w", err)
+	logger.Errorf("error trying to stop server: %v", err)
+	err = repo.Close(ctx)
+	logger.Errorf("error closing database connection: %v", err)
 
 }

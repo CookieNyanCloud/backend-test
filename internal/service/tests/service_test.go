@@ -5,15 +5,15 @@ import (
 	"testing"
 
 	"github.com/cookienyancloud/avito-backend-test/internal/domain"
-	mock_repository "github.com/cookienyancloud/avito-backend-test/internal/repository/mocks"
 	service "github.com/cookienyancloud/avito-backend-test/internal/service"
+	mock_service "github.com/cookienyancloud/avito-backend-test/internal/service/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	"github.com/magiconair/properties/assert"
 )
 
 func TestMakeTransaction(t *testing.T) {
-	type mockBehavior func(m *mock_repository.MockIRepo, inp *domain.TransactionInput)
+	type mockBehavior func(m *mock_service.MockIRepo, inp *domain.TransactionInput)
 
 	tt := []struct {
 		name  string
@@ -30,7 +30,7 @@ func TestMakeTransaction(t *testing.T) {
 				Sum:         10,
 				Description: "test",
 			},
-			mockB: func(r *mock_repository.MockIRepo, inp *domain.TransactionInput) {
+			mockB: func(r *mock_service.MockIRepo, inp *domain.TransactionInput) {
 				r.
 					EXPECT().
 					MakeTransaction(gomock.Any(), inp).
@@ -47,7 +47,7 @@ func TestMakeTransaction(t *testing.T) {
 			c := gomock.NewController(t)
 
 			defer c.Finish()
-			dbMain := mock_repository.NewMockIRepo(c)
+			dbMain := mock_service.NewMockIRepo(c)
 			tc.mockB(dbMain, tc.inp)
 			fs := service.NewFinanceService(dbMain)
 			err := fs.MakeTransaction(context.Background(), tc.inp)
@@ -57,7 +57,7 @@ func TestMakeTransaction(t *testing.T) {
 }
 
 func TestMakeRemittance(t *testing.T) {
-	type mockBehavior func(m *mock_repository.MockIRepo, inp *domain.RemittanceInput)
+	type mockBehavior func(m *mock_service.MockIRepo, inp *domain.RemittanceInput)
 
 	tt := []struct {
 		name  string
@@ -75,7 +75,7 @@ func TestMakeRemittance(t *testing.T) {
 				Sum:         10,
 				Description: "test",
 			},
-			mockB: func(r *mock_repository.MockIRepo, inp *domain.RemittanceInput) {
+			mockB: func(r *mock_service.MockIRepo, inp *domain.RemittanceInput) {
 				r.
 					EXPECT().
 					MakeRemittance(gomock.Any(), inp).
@@ -93,7 +93,7 @@ func TestMakeRemittance(t *testing.T) {
 			c := gomock.NewController(t)
 
 			defer c.Finish()
-			dbMain := mock_repository.NewMockIRepo(c)
+			dbMain := mock_service.NewMockIRepo(c)
 			tc.mockB(dbMain, tc.inp)
 			fs := service.NewFinanceService(dbMain)
 			err := fs.MakeRemittance(context.Background(), tc.inp)
@@ -103,7 +103,7 @@ func TestMakeRemittance(t *testing.T) {
 }
 
 func TestGetBalance(t *testing.T) {
-	type mockBehavior func(m *mock_repository.MockIRepo, inp *domain.BalanceInput)
+	type mockBehavior func(m *mock_service.MockIRepo, inp *domain.BalanceInput)
 
 	tt := []struct {
 		name   string
@@ -117,7 +117,7 @@ func TestGetBalance(t *testing.T) {
 			inp: &domain.BalanceInput{
 				Id: uuid.MustParse("1993f8f2-d580-4fb1-bd8e-5bdfb7ddd7e4"),
 			},
-			mockB: func(r *mock_repository.MockIRepo, inp *domain.BalanceInput) {
+			mockB: func(r *mock_service.MockIRepo, inp *domain.BalanceInput) {
 				r.
 					EXPECT().
 					GetBalance(gomock.Any(), inp).
@@ -132,7 +132,7 @@ func TestGetBalance(t *testing.T) {
 			c := gomock.NewController(t)
 
 			defer c.Finish()
-			dbMain := mock_repository.NewMockIRepo(c)
+			dbMain := mock_service.NewMockIRepo(c)
 			tc.mockB(dbMain, tc.inp)
 			fs := service.NewFinanceService(dbMain)
 			res, err := fs.GetBalance(context.Background(), tc.inp)
@@ -143,7 +143,7 @@ func TestGetBalance(t *testing.T) {
 }
 
 func TestGetTransactionsList(t *testing.T) {
-	type mockBehavior func(m *mock_repository.MockIRepo, inp *domain.TransactionsListInput)
+	type mockBehavior func(m *mock_service.MockIRepo, inp *domain.TransactionsListInput)
 
 	tt := []struct {
 		name   string
@@ -151,7 +151,7 @@ func TestGetTransactionsList(t *testing.T) {
 		inp    *domain.TransactionsListInput
 		mockB  mockBehavior
 		expErr error
-		expRes []domain.TransactionsList
+		expRes []domain.TransactionsListResponse
 	}{
 		{
 			name: "ok",
@@ -162,14 +162,14 @@ func TestGetTransactionsList(t *testing.T) {
 				Dir:  "asc",
 				Page: 1,
 			},
-			mockB: func(r *mock_repository.MockIRepo, inp *domain.TransactionsListInput) {
+			mockB: func(r *mock_service.MockIRepo, inp *domain.TransactionsListInput) {
 				r.
 					EXPECT().
 					GetTransactionsList(gomock.Any(), inp).
 					Return([]domain.TransactionsList{}, nil)
 			},
 			expErr: nil,
-			expRes: []domain.TransactionsList{},
+			expRes: []domain.TransactionsListResponse{},
 		},
 	}
 	for _, tc := range tt {
@@ -177,7 +177,7 @@ func TestGetTransactionsList(t *testing.T) {
 			c := gomock.NewController(t)
 
 			defer c.Finish()
-			dbMain := mock_repository.NewMockIRepo(c)
+			dbMain := mock_service.NewMockIRepo(c)
 			tc.mockB(dbMain, tc.inp)
 			fs := service.NewFinanceService(dbMain)
 			res, err := fs.GetTransactionsList(context.Background(), tc.inp)

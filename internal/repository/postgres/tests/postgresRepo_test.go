@@ -8,7 +8,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/cookienyancloud/avito-backend-test/internal/domain"
-	"github.com/cookienyancloud/avito-backend-test/internal/repository"
+	"github.com/cookienyancloud/avito-backend-test/internal/repository/postgres"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
@@ -60,7 +60,7 @@ func TestMakeTransaction(t *testing.T) {
 				id:  tc.inp.Id,
 				sum: tc.inp.Sum,
 			})
-			repo := repository.NewFinanceRepo(sqlxDB)
+			repo := postgres.NewFinanceRepo(sqlxDB)
 			err := repo.MakeTransaction(context.Background(), tc.inp)
 			if err := mock.ExpectationsWereMet(); err != nil {
 				t.Errorf("there were unfulfilled expectations: %s", err)
@@ -131,7 +131,7 @@ func TestMakeRemittance(t *testing.T) {
 				idTo:   tc.inp.IdTo,
 				sum:    tc.inp.Sum,
 			})
-			repo := repository.NewFinanceRepo(sqlxDB)
+			repo := postgres.NewFinanceRepo(sqlxDB)
 			err := repo.MakeRemittance(context.Background(), tc.inp)
 			if err := mock.ExpectationsWereMet(); err != nil {
 				t.Errorf("there were unfulfilled expectations: %s", err)
@@ -189,7 +189,7 @@ func TestGetBalance(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			sqlxDB := sqlx.NewDb(mockDB, "sqlmock")
 			tc.mockB(tc.exec, args{id: tc.inp.Id}, tc.expRes)
-			repo := repository.NewFinanceRepo(sqlxDB)
+			repo := postgres.NewFinanceRepo(sqlxDB)
 			res, err := repo.GetBalance(context.Background(), tc.inp)
 			if err := mock.ExpectationsWereMet(); err != nil {
 				t.Errorf("there were unfulfilled expectations: %s", err)
@@ -262,7 +262,7 @@ func TestGetTransactionsList(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			sqlxDB := sqlx.NewDb(mockDB, "sqlmock")
 			tc.mockB(tc.exec, args{id: tc.inp.Id}, tc.expRes)
-			repo := repository.NewFinanceRepo(sqlxDB)
+			repo := postgres.NewFinanceRepo(sqlxDB)
 			res, err := repo.GetTransactionsList(context.Background(), tc.inp)
 			if err := mock.ExpectationsWereMet(); err != nil {
 				t.Errorf("there were unfulfilled expectations: %s", err)
@@ -335,7 +335,7 @@ func TestCreateNewTransaction(t *testing.T) {
 				idTo:        tc.inp.idTo,
 				description: tc.inp.description,
 			})
-			repo := repository.NewFinanceRepo(sqlxDB)
+			repo := postgres.NewFinanceRepo(sqlxDB)
 			err := repo.CreateNewTransaction(context.Background(), tc.inp.idFrom, tc.inp.operation, tc.inp.sum, tc.inp.idTo, tc.inp.description)
 			if err := mock.ExpectationsWereMet(); err != nil {
 				t.Errorf("there were unfulfilled expectations: %s", err)

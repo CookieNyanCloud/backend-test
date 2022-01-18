@@ -10,8 +10,6 @@ import (
 	"github.com/cookienyancloud/avito-backend-test/internal/domain"
 )
 
-//go:generate mockgen -source=curService.go -destination=mocks/curServiceMock.go
-
 const baseCurURL = "http://api.exchangeratesapi.io/v1/latest?access_key=%s&symbols=RUB,%s"
 
 type curService struct {
@@ -32,11 +30,6 @@ var (
 		"JPY": "¥",
 	}
 )
-
-//currency interface
-type ICurrency interface {
-	GetCur(cur string, sum float64) (string, error)
-}
 
 //api currency
 func (u curService) GetCur(cur string, sum float64) (string, error) {

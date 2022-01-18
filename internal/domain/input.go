@@ -11,7 +11,6 @@ type TransactionInput struct {
 	Id          uuid.UUID `json:"id" binding:"required"`
 	Sum         float64   `json:"sum" binding:"required"`
 	Description string    `json:"description" binding:"max=20"`
-	//IdempotencyKey uuid.UUID `json:"idempotency_key" binding:"required"`
 }
 
 //user input for remittance
@@ -20,13 +19,11 @@ type RemittanceInput struct {
 	IdTo        uuid.UUID `json:"id_to" binding:"required"`
 	Sum         float64   `json:"sum" binding:"required,gt=0"`
 	Description string    `json:"description" binding:"max=20"`
-	//IdempotencyKey uuid.UUID `json:"idempotency_key" binding:"required"`
 }
 
 //user input for balance
 type BalanceInput struct {
 	Id uuid.UUID `json:"id" binding:"required"`
-	//Cur string    `json:"-"`
 }
 
 //user input for list of transactions
@@ -40,7 +37,7 @@ type TransactionsListInput struct {
 //struct for  transactions list request
 type TransactionsList struct {
 	Id          uuid.UUID `json:"id" db:"user_id"`
-	Operation   string    `json:"operation"db:"operation"`
+	Operation   string    `json:"operation" db:"operation"`
 	Sum         float64   `json:"sum" db:"sum"`
 	Date        time.Time `json:"date" db:"date"`
 	Description string    `json:"description,omitempty" db:"description"`

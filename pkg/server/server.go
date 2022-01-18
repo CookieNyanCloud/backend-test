@@ -19,7 +19,7 @@ func NewServer(cfg *config.Config, handler http.Handler) *server {
 			Handler:        handler,
 			ReadTimeout:    cfg.HTTP.ReadTimeout,
 			WriteTimeout:   cfg.HTTP.WriteTimeout,
-			MaxHeaderBytes: cfg.HTTP.MaxHeaderMegabytes << 20,
+			MaxHeaderBytes: cfg.HTTP.MaxHeaderBytes << 20,
 		},
 	}
 }

@@ -12,6 +12,7 @@ type (
 		Postgres PostgresConfig
 		HTTP     HTTPConfig
 		Redis    RedisConfig
+		State    StateConfig
 		ApiKey   string
 	}
 	//postgres vars
@@ -25,15 +26,19 @@ type (
 	}
 	//http server vars
 	HTTPConfig struct {
-		Host               string
-		Port               string
-		ReadTimeout        time.Duration
-		WriteTimeout       time.Duration
-		MaxHeaderMegabytes int
+		Host           string
+		Port           string
+		ReadTimeout    time.Duration
+		WriteTimeout   time.Duration
+		MaxHeaderBytes int
 	}
 	//redis cache vars
 	RedisConfig struct {
 		Addr string
+	}
+
+	StateConfig struct {
+		DataBase string
 	}
 )
 
@@ -75,6 +80,9 @@ func unmarshal(cfg *Config) error {
 		return err
 	}
 	if err := viper.UnmarshalKey("redis", &cfg.Redis); err != nil {
+		return err
+	}
+	if err := viper.UnmarshalKey("state", &cfg.State); err != nil {
 		return err
 	}
 	return nil

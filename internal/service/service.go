@@ -4,26 +4,29 @@ import (
 	"context"
 
 	"github.com/cookienyancloud/avito-backend-test/internal/domain"
-	"github.com/cookienyancloud/avito-backend-test/internal/repository"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )
 
-//go:generate mockgen -source=service.go -destination=mocks/serviceMock.go
+//go:generate mockgen -source=service.go -destination=mocks/RepoMock.go
 
-type FinanceService struct {
-	repo repository.IRepo
-}
-
-func NewFinanceService(repo repository.IRepo) *FinanceService {
-	return &FinanceService{repo}
-}
-
-type IService interface {
+type IRepo interface {
+	//main
 	MakeTransaction(ctx context.Context, inp *domain.TransactionInput) error
 	MakeRemittance(ctx context.Context, inp *domain.RemittanceInput) error
 	GetBalance(ctx context.Context, inp *domain.BalanceInput) (float64, error)
-	GetTransactionsList(ctx context.Context, inp *domain.TransactionsListInput) ([]domain.TransactionsListResponse, error)
+	GetTransactionsList(ctx context.Context, inp *domain.TransactionsListInput) ([]domain.TransactionsList, error)
+	//sub
+	CreateNewTransaction(ctx context.Context, idFrom uuid.UUID, operation string, sum float64, idTo uuid.UUID, description string) error
+	Close(ctx context.Context) error
+}
+
+type FinanceService struct {
+	repo IRepo
+}
+
+func NewFinanceService(repo IRepo) *FinanceService {
+	return &FinanceService{repo}
 }
 
 func (f *FinanceService) MakeTransaction(ctx context.Context, inp *domain.TransactionInput) error {

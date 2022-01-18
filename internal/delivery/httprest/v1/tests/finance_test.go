@@ -6,10 +6,9 @@ import (
 	"testing"
 	"time"
 
-	mock_redis "github.com/cookienyancloud/avito-backend-test/internal/cache/redis/mocks"
-	"github.com/cookienyancloud/avito-backend-test/internal/delivery/http/v1"
+	"github.com/cookienyancloud/avito-backend-test/internal/delivery/httprest/v1"
+	mock_service "github.com/cookienyancloud/avito-backend-test/internal/delivery/httprest/v1/mocks"
 	"github.com/cookienyancloud/avito-backend-test/internal/domain"
-	mock_service "github.com/cookienyancloud/avito-backend-test/internal/service/mocks"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
@@ -66,7 +65,7 @@ func TestTransaction(t *testing.T) {
 			defer c.Finish()
 			finService := mock_service.NewMockIService(c)
 			subService := mock_service.NewMockICurrency(c)
-			cache := mock_redis.NewMockICache(c)
+			cache := mock_service.NewMockICache(c)
 			w := httptest.NewRecorder()
 			r := gin.New()
 			tc.mockB(finService, tc.input)
@@ -135,7 +134,7 @@ func TestRemittance(t *testing.T) {
 			defer c.Finish()
 			finService := mock_service.NewMockIService(c)
 			subService := mock_service.NewMockICurrency(c)
-			cache := mock_redis.NewMockICache(c)
+			cache := mock_service.NewMockICache(c)
 			w := httptest.NewRecorder()
 			r := gin.New()
 			tc.mockB(finService, tc.input)
@@ -209,7 +208,7 @@ func TestBalance(t *testing.T) {
 			defer c.Finish()
 			finService := mock_service.NewMockIService(c)
 			subService := mock_service.NewMockICurrency(c)
-			cache := mock_redis.NewMockICache(c)
+			cache := mock_service.NewMockICache(c)
 			w := httptest.NewRecorder()
 			r := gin.New()
 			tc.mockB(finService, subService, tc.input)
@@ -252,13 +251,13 @@ func TestTransactionsList(t *testing.T) {
 				s.
 					EXPECT().
 					GetTransactionsList(gomock.Any(), inp).
-					Return([]domain.TransactionsList{domain.TransactionsList{
+					Return([]domain.TransactionsListResponse{{
 						Id:          uuid.UUID{},
 						Operation:   "remittance",
 						Sum:         10,
 						Date:        parse,
 						Description: "",
-						IdTo:        uuid.MustParse("1993f8f2-d580-4fb1-bd8e-5bdfb7ddd7e4"),
+						IdTo:        uuid.MustParse("1993f8f2-d580-4fb1-bd8e-5bdfb7ddd7e4").String(),
 					}}, nil)
 			},
 			expStatusCode: 200,
@@ -272,7 +271,7 @@ func TestTransactionsList(t *testing.T) {
 			defer c.Finish()
 			finService := mock_service.NewMockIService(c)
 			subService := mock_service.NewMockICurrency(c)
-			cache := mock_redis.NewMockICache(c)
+			cache := mock_service.NewMockICache(c)
 			w := httptest.NewRecorder()
 			r := gin.New()
 			tc.mockB(finService, tc.input)
