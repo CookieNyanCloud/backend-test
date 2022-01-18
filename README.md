@@ -147,7 +147,7 @@ host=db
 
 ## структура папок
 создана моей программой https://github.com/CookieNyanCloud/dirtree
-![Tree](https://i.ibb.co/n8SygLH/tree.png)
+![Tree](https://i.ibb.co/2ZPxtLw/tree.png)
 
 
 ## схема
