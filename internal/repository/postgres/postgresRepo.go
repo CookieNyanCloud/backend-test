@@ -119,19 +119,6 @@ func (r *FinanceRepo) CreateNewTransaction(ctx context.Context, idFrom uuid.UUID
 	return nil
 }
 
-//start migration
-//func (r *FinanceRepo) StartMigration(ctx context.Context, dir, dest string) error {
-//	path := filepath.Join(dir, dest)
-//	c, err := ioutil.ReadFile(path)
-//	if err != nil {
-//		return errors.Wrap(err, "read file")
-//	}
-//	sqlStr := string(c)
-//	if _, err := r.db.ExecContext(ctx, sqlStr); err != nil {
-//		return errors.Wrap(err, "execute")
-//	}
-//	return nil
-//}
 
 //close db
 func (r *FinanceRepo) Close(ctx context.Context) error {
