@@ -71,3 +71,7 @@ func (f *FinanceService) GetTransactionsList(ctx context.Context, inp *domain.Tr
 	}
 	return responses, nil
 }
+
+func (f *FinanceService) Close(ctx context.Context) error {
+	return f.repo.Close(ctx)
+}

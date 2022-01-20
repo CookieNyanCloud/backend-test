@@ -119,7 +119,6 @@ func (r *FinanceRepo) CreateNewTransaction(ctx context.Context, idFrom uuid.UUID
 	return nil
 }
 
-
 //close db
 func (r *FinanceRepo) Close(ctx context.Context) error {
 	return r.db.Close()
