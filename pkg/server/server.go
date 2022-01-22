@@ -3,8 +3,7 @@ package server
 import (
 	"context"
 	"net/http"
-
-	"github.com/cookienyancloud/avito-backend-test/internal/config"
+	"time"
 )
 
 type server struct {
@@ -12,14 +11,14 @@ type server struct {
 }
 
 //new server
-func NewServer(cfg *config.Config, handler http.Handler) *server {
+func NewServer(port string, readTimeout, writeTimeout time.Duration, maxHeaderBytes int, handler http.Handler) *server {
 	return &server{
 		httpServer: &http.Server{
-			Addr:           ":" + cfg.HTTP.Port,
+			Addr:           ":" + port,
 			Handler:        handler,
-			ReadTimeout:    cfg.HTTP.ReadTimeout,
-			WriteTimeout:   cfg.HTTP.WriteTimeout,
-			MaxHeaderBytes: cfg.HTTP.MaxHeaderBytes << 20,
+			ReadTimeout:    readTimeout,
+			WriteTimeout:   writeTimeout,
+			MaxHeaderBytes: maxHeaderBytes << 20,
 		},
 	}
 }

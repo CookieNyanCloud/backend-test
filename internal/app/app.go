@@ -44,7 +44,12 @@ func Run(configPath string, local bool) {
 	handlers := delivery.NewHandler(financeService, curService, cacheService)
 
 	//server
-	srv := server.NewServer(cfg, handlers.Init(cfg))
+	srv := server.NewServer(
+		cfg.HTTP.Port,
+		cfg.HTTP.ReadTimeout,
+		cfg.HTTP.WriteTimeout,
+		cfg.HTTP.MaxHeaderBytes,
+		handlers.Init(cfg))
 	go func() {
 		if err := srv.Run(); !errors.Is(err, http.ErrServerClosed) {
 			logger.Errorf("error during http server work: %v", err)

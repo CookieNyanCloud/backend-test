@@ -16,7 +16,13 @@ func SwitchDb(ctx context.Context, cfg *config.Config) (service.IRepo, error) {
 	switch cfg.State.DataBase {
 	case "postgres":
 		logger.Info("postgres")
-		postgresClient, err := postgresql.NewClient(ctx, cfg.Postgres)
+		postgresClient, err := postgresql.NewClient(
+			ctx,
+			cfg.Postgres.Username,
+			cfg.Postgres.Password,
+			cfg.Postgres.Host,
+			cfg.Postgres.Port,
+			cfg.Postgres.DBName)
 		if err != nil {
 			return nil, errors.Wrap(err, "postgres")
 		}
