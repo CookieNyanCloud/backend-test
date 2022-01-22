@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/pkg/errors"
 )
 
 //client for redis
@@ -17,7 +18,7 @@ func NewRedisClient(ctx context.Context, addr string) (*RedisClient, error) {
 		Addr: addr,
 	})
 	if err := client.Ping(ctx).Err(); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "ping")
 	}
 	return &RedisClient{
 		Client: client,
